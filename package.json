@@ -1,0 +1,13 @@
+{
+  "name": "vitalis",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Doctor dashboard with a local SQLite store and a sensor ingestion API",
+  "scripts": {
+    "start": "node server.js",
+    "sensors": "node simulator.js",
+    "reset": "rm -f data/clinic.db data/clinic.db-wal data/clinic.db-shm"
+  },
+  "engines": { "node": ">=22.5" }
+}

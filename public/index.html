@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitalis · Doctor Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f1f3f0; --card:#fff; --ink:#16201a; --muted:#55615a; --line:#e3e8e2; --tile:#f4f6f3;
+  --green:#1d3a27; --green2:#2f5a3c;
+  --ok:#3f9d62; --warn:#d99a2b; --crit:#d6503f;
+  --warn-ink:#8a5a00; --crit-ink:#b42318; --warn-bg:#fdf1d8; --crit-bg:#fde8e5;
+  --serif:'Fraunces',Georgia,serif; --sans:'Figtree',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);font-size:14px;-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+.muted{color:var(--muted)}
+.t{font-family:var(--mono)}                 /* monospace: times only */
+.serif{font-family:var(--serif);font-weight:400}
+
+.app{display:grid;grid-template-columns:64px 288px minmax(0,1fr);gap:16px;height:100vh;padding:24px}
+.card{background:var(--card);border-radius:16px;border:1px solid var(--line)}
+.pad{padding:20px}
+.h{font-size:16px;font-weight:600}
+
+/* nav rail */
+.rail{background:var(--card);border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:8px}
+.logo{width:40px;height:40px;border-radius:8px;background:var(--green);display:grid;place-items:center;margin-bottom:16px}
+.nav{width:40px;height:40px;border-radius:8px;display:grid;place-items:center;color:var(--muted)}
+.nav:hover{background:var(--tile)}
+.nav.on{background:var(--green);color:#fff}
+.nav svg,.logo svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.rail .sp{flex:1}
+.me{width:40px;height:40px;border-radius:8px;background:var(--tile);display:grid;place-items:center;font-weight:600;font-size:13px}
+
+/* patient list */
+.plist{display:flex;flex-direction:column;min-height:0;padding:16px 12px 12px}
+.plist .hd{padding:0 8px 8px}
+.plist .hd b{font-size:18px;display:block}
+.filters{display:flex;gap:8px;padding:0 8px 8px}
+.chip{padding:6px 12px;border-radius:8px;background:var(--tile);font-size:13px;color:var(--muted);font-weight:500}
+.chip.on{background:var(--green);color:#fff}
+.plist-scroll{overflow:auto;display:flex;flex-direction:column;gap:0;flex:1}
+.pt{display:flex;gap:8px;align-items:center;justify-content:space-between;height:56px;flex:none;padding:0 8px;border-radius:8px;text-align:left;width:100%}
+.pt:hover{background:var(--tile)}
+.pt.on{background:#e4eee6}
+.pt .pn{min-width:0;display:flex;flex-direction:column;gap:2px}
+.pt .pn b{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt .ps{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.pt .ps em{font-style:normal;font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.crit{background:var(--crit)}
+.pw{font-size:13px;font-weight:600;white-space:nowrap;flex:none}
+.pw.ok{color:var(--muted);font-weight:500}.pw.warn{color:var(--warn-ink)}.pw.crit{color:var(--crit-ink)}
+.ps em.ok{color:var(--muted)}.ps em.warn{color:var(--warn-ink)}.ps em.crit{color:var(--crit-ink)}
+
+/* right side */
+.right{display:grid;grid-template-rows:56px minmax(0,1fr);gap:16px;min-width:0;min-height:0}
+.topbar{display:flex;align-items:center;gap:16px}
+.topbar .date{font-size:14px;font-weight:500;white-space:nowrap;min-width:200px}
+.search{flex:1;max-width:360px;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0 12px;height:40px}
+.search input{border:0;background:none;outline:0;width:100%}
+.search svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;flex:none}
+.live{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);white-space:nowrap}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.bell{width:40px;height:40px;border-radius:8px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;position:relative}
+.bell svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+.bell em{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--crit)}
+
+.content{min-height:0;overflow:auto}
+.view{display:none}
+body[data-view=overview] #v-overview{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;height:100%;min-height:640px}
+body[data-view=rx] #v-rx,body[data-view=devices] #v-devices{display:block}
+
+.center{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:72px 104px minmax(0,1fr);gap:16px;min-height:0}
+.side{display:flex;flex-direction:column;gap:16px;min-height:0}
+.c12{grid-column:span 12}.c8{grid-column:span 8}.c4{grid-column:span 4}
+
+/* patient header */
+.phead{display:flex;align-items:center;justify-content:space-between;padding:0 20px;gap:16px}
+.phead h2{font-family:var(--serif);font-weight:500;font-size:26px;line-height:1.1}
+.phead .meta{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:8px;background:var(--crit-bg);color:var(--crit-ink)}
+.stt{font-size:13px;font-weight:600;padding:6px 12px;border-radius:8px;white-space:nowrap}
+.stt.ok{background:#e4eee6;color:#256b40}.stt.warn{background:var(--warn-bg);color:var(--warn-ink)}.stt.crit{background:var(--crit-bg);color:var(--crit-ink)}
+
+/* vitals strip */
+.vstrip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.v{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 10px;display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+.v .lab{font-size:13px;font-weight:600;white-space:nowrap;display:flex;gap:4px;align-items:baseline}
+.v .lab span{font-size:12px;font-weight:400;color:var(--muted)}
+.v .num{font-family:var(--serif);font-size:32px;line-height:1;white-space:nowrap;font-variant-numeric:lining-nums tabular-nums}
+.v .num.long{font-size:24px;padding:4px 0}
+.v .st{font-size:12px;color:var(--muted);white-space:nowrap}
+.v.warn{background:var(--warn-bg);border-color:#f3dba5}.v.warn .st{color:var(--warn-ink);font-weight:600}
+.v.crit{background:var(--crit-bg);border-color:#f5c3bb}.v.crit .st{color:var(--crit-ink);font-weight:600}
+
+/* details */
+.det{display:flex;flex-direction:column;gap:8px}
+.det .dg{flex:none}.det .dg div{min-height:64px}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1}
+.dg div{background:var(--tile);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;justify-content:center}
+.dg span{font-size:12px;color:var(--muted)}
+.dg b{font-family:var(--serif);font-weight:400;font-size:22px;line-height:1.2}
+.dg b small{font-family:var(--sans);font-size:12px;color:var(--muted);margin-left:2px}
+.note{font-size:12px;color:var(--muted)}
+
+/* trends */
+.tcard{display:flex;flex-direction:column;min-height:0}
+.tcard .ch{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.seg{display:inline-flex;background:var(--tile);border-radius:8px;padding:2px}
+.seg button{padding:5px 10px;border-radius:6px;font-size:13px;color:var(--muted);font-weight:500}
+.seg button.on{background:var(--green);color:#fff}
+.trend{position:relative;flex:1;min-height:0}
+.trend svg{position:absolute;inset:0;width:100%;height:100%}
+.tip{position:absolute;pointer-events:none;background:var(--green);color:#fff;padding:6px 10px;border-radius:8px;font-size:12px;transform:translate(-50%,-120%);white-space:nowrap;opacity:0;z-index:3}
+.legend{display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--muted)}
+.legend span{display:flex;gap:6px;align-items:center}
+.legend i{width:8px;height:8px;border-radius:2px}
+.sleepbars{display:flex;gap:8px;align-items:flex-end;height:96px}
+.sleepbars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%;font-size:12px;color:var(--muted)}
+.sleepbars i{width:100%;border-radius:4px;background:#cfd9d1;display:block}
+.sleepbars div.last i{background:var(--green)}
+.bar{height:8px;border-radius:4px;background:var(--tile);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--green2);border-radius:4px}
+.big{font-family:var(--serif);font-size:32px;line-height:1.1}
+.big small{font-family:var(--sans);font-size:13px;color:var(--muted);margin-left:4px}
+
+/* right rail */
+.rrail{display:flex;flex-direction:column;gap:16px;overflow:auto;min-height:0}
+.rrail .card{flex:none}
+.rrail .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.alg{display:block;width:100%;text-align:left;border-radius:8px;padding:8px 12px;margin-bottom:8px}
+.alg:last-child{margin-bottom:0}
+.alg.crit{background:var(--crit-bg)}.alg.warn{background:var(--warn-bg)}
+.alg .ah{display:flex;justify-content:space-between;gap:8px}
+.alg b{font-weight:600}
+.alg em{font-style:normal;font-size:12px;font-weight:600}
+.alg.crit em{color:var(--crit-ink)}.alg.warn em{color:var(--warn-ink)}
+.alg .at{font-size:13px;color:#3a463f;display:block;margin-top:2px}
+.ap{display:flex;align-items:center;gap:12px;height:40px;width:100%;padding:0 8px;border-radius:8px;text-align:left}
+.ap:hover{background:var(--tile)}
+.ap .t{font-size:13px;width:44px;flex:none}
+.ap b{font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ap span.ty{font-size:12px;color:var(--muted);white-space:nowrap}
+.mrow{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.mrow:first-of-type{border-top:0}
+.mrow b{font-weight:600;display:block}
+.mrow span{font-size:12px;color:var(--muted)}
+.empty{padding:8px;color:var(--muted);font-size:13px}
+
+/* devices */
+.devgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font-weight:600;color:var(--muted);padding:8px;border-bottom:1px solid var(--line);font-size:12px}
+.tbl td{padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl tr.off td{background:var(--warn-bg);color:var(--warn-ink)}
+.tbl .id{font-family:var(--mono);font-size:12px}
+.ing{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.ing:last-child{border:0}.ing .t{color:var(--muted);flex:none;font-size:12px;padding-top:1px}
+.code{background:#12171a;color:#e6efe9;border-radius:8px;padding:12px;font-family:var(--mono);font-size:12px;white-space:pre-wrap;word-break:break-all;line-height:1.5}
+@media (max-width:1100px){.devgrid{grid-template-columns:1fr}}
+
+/* prescriptions */
+.rxgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+.form{padding:24px;display:flex;flex-direction:column;gap:16px}
+.form h3{font-size:20px;font-weight:600}
+.fld label.l{display:block;margin-bottom:8px;font-size:13px;font-weight:600}
+.inp{width:100%;border:1px solid #ccd5ce;background:#fff;border-radius:8px;padding:10px 12px;outline:0}
+.inp:focus{border-color:var(--green2);box-shadow:0 0 0 3px rgba(47,90,60,.15)}
+.inp.bad{border-color:var(--crit);box-shadow:0 0 0 3px rgba(214,80,63,.15)}
+textarea.inp{resize:vertical;min-height:72px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.three{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:16px}
+.slots{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.slot{display:flex;align-items:center;gap:8px;background:var(--tile);border-radius:8px;padding:4px 4px 4px 12px}
+.slot span{font-size:12px;color:var(--muted)}
+.slot input{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 8px;font-family:var(--mono);font-size:13px;outline:0}
+.slot button{width:24px;height:24px;border-radius:6px;font-size:16px;line-height:1}
+.slot button:hover{background:#e3e8e2}
+.addslot{padding:8px 12px;border-radius:8px;border:1px dashed #b9c8bd;color:var(--muted);font-size:13px}
+.btn{padding:10px 20px;border-radius:8px;font-weight:600}
+.btn.pri{background:var(--green);color:#fff}.btn.pri:hover{background:var(--green2)}
+.btn.sec{background:var(--tile)}
+.warnbox{display:none;background:var(--crit-bg);color:var(--crit-ink);border-radius:8px;padding:12px;font-weight:600}
+.warnbox.show{display:block}
+.slip{padding:24px}
+.slip hr{border:0;border-top:1px dashed #cfd9d1;margin:16px 0}
+.slip .nm{font-size:22px;font-weight:600;line-height:1.2}
+.slip dl{display:grid;grid-template-columns:96px 1fr;gap:8px;margin-top:16px}
+.slip dt{font-size:13px;color:var(--muted)}
+.slip dd{font-weight:500}
+.rxitem{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-top:1px solid var(--line)}
+.rxitem:first-of-type{border-top:0;padding-top:0}
+.rxitem.stopped{opacity:.6}
+.rxitem b{font-size:15px}
+.rxitem .acts{margin-left:auto;display:flex;gap:8px;flex:none}
+.rxitem .acts button{padding:5px 12px;border-radius:8px;background:var(--tile);font-size:13px;font-weight:500}
+.rxitem .acts button:hover{background:var(--green);color:#fff}
+.times{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.times span{font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:8px;background:var(--tile)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,24px);background:var(--green);color:#fff;padding:12px 20px;border-radius:8px;opacity:0;transition:.25s;z-index:20}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+#printarea{display:none}
+@media print{
+  @page{margin:16mm}
+  html,body{height:auto;overflow:visible;background:#fff}
+  .app,.toast{display:none!important}
+  #printarea{display:block;color:#000;font-size:13px}
+  .pr header{display:flex;justify-content:space-between;border-bottom:2px solid #1d3a27;padding-bottom:12px;margin-bottom:16px}
+  .pr h1{font-family:var(--serif);font-size:26px;font-weight:500;color:#1d3a27}
+  .pr .box{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;padding:12px;border:1px solid #ccc;border-radius:8px;margin-bottom:20px}
+  .pr .item{padding:12px 0;border-bottom:1px solid #ddd;break-inside:avoid}
+  .pr .item b{font-size:16px}
+  .pr .rxm{font-size:28px;color:#1d3a27;font-weight:600}
+  .pr .sign{margin-top:56px;text-align:right;font-family:var(--serif);font-style:italic;font-size:18px}
+  .pr .sign div{border-top:1px solid #000;display:inline-block;padding-top:4px;min-width:200px}
+}
+@media (max-width:1360px){
+  body{overflow:auto}.app{height:auto;min-height:100vh}
+  body[data-view=overview] #v-overview{grid-template-columns:minmax(0,1fr);height:auto}
+  .center{grid-template-rows:72px auto 360px}.rrail{overflow:visible}
+  .vstrip{grid-template-columns:repeat(3,1fr)}.v{min-height:104px}.rxgrid{grid-template-columns:1fr}
+}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr;padding:16px}.rail{flex-direction:row;justify-content:center}.rail .sp{display:none}.logo{margin:0}
+  .plist{max-height:360px}.c8,.c4{grid-column:span 12}.center{grid-template-rows:auto}.tcard{height:320px}.topbar .date,.live{display:none}.two,.three{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body data-view="overview">
+<div class="app">
+  <nav class="rail">
+    <div class="logo"><svg viewBox="0 0 24 24" style="stroke:#fff"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg></div>
+    <button class="nav on" data-nav="overview" title="Overview"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg></button>
+    <button class="nav" data-nav="rx" title="Prescriptions"><svg viewBox="0 0 24 24"><path d="M10.5 20.5 3.5 13.5a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg></button>
+    <button class="nav" data-nav="devices" title="Devices"><svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></button>
+    <div class="sp"></div>
+    <div class="me" title="Dr. Anika Rao">AR</div>
+  </nav>
+
+  <aside class="card plist">
+    <div class="hd"><b>Patients</b><span class="muted" id="pcount" style="font-size:13px"></span></div>
+    <div class="filters" id="filters"><button class="chip on" data-f="all">All</button><button class="chip" data-f="crit">Critical</button><button class="chip" data-f="warn">Watch</button></div>
+    <div class="plist-scroll" id="plist"></div>
+  </aside>
+
+  <div class="right">
+    <header class="topbar">
+      <div class="date" id="today"></div>
+      <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="Search patient or condition"></label>
+      <div class="live"><i></i><span id="sync">Live · 1s ago</span></div>
+      <button class="bell" id="bell" title="Alerts"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><em id="bdot"></em></button>
+    </header>
+
+    <div class="content">
+      <!-- OVERVIEW -->
+      <section class="view" id="v-overview">
+        <div class="center">
+          <div class="card phead c12" id="phead"></div>
+          <div class="vstrip c12" id="vstrip"></div>
+                    <div class="card pad tcard c8">
+            <div class="ch"><span class="h">24h trends</span>
+              <div class="seg" id="tabs"><button class="on" data-m="hr">HR</button><button data-m="spo2">SpO₂</button><button data-m="bp">BP</button><button data-m="temp">Temp</button><button data-m="glu">Glucose</button></div></div>
+            <div class="trend" id="trend"></div>
+            <div class="legend" id="legend"></div>
+          </div>
+          <div class="c4 side"><div class="card pad det" id="det"></div><div class="card pad" id="act" style="flex:1"></div></div>
+        </div>
+        <aside class="rrail">
+          <div class="card pad"><div class="ch"><span class="h">Alerts</span><span class="muted" id="acount" style="font-size:13px"></span></div><div id="alerts"></div></div>
+          <div class="card pad"><div class="ch"><span class="h">Today</span><span class="muted" id="sdate" style="font-size:13px"></span></div><div id="appts"></div></div>
+          <div class="card pad"><div class="ch"><span class="h">Current medication</span><button class="chip" id="goRx">Manage</button></div><div id="minirx"></div></div>
+        </aside>
+      </section>
+
+      <!-- DEVICES -->
+      <section class="view" id="v-devices">
+        <div class="devgrid">
+          <div class="card pad" style="grid-column:span 2"><div class="ch" style="display:flex;justify-content:space-between;margin-bottom:8px"><span class="h">Connected sensors</span><span class="muted" id="devcount" style="font-size:13px"></span></div>
+            <table class="tbl"><thead><tr><th>Device</th><th>Type</th><th>Patient</th><th>Battery</th><th>Status</th></tr></thead><tbody id="devtable"></tbody></table></div>
+          <div class="card pad"><div class="ch" style="margin-bottom:8px"><span class="h">Live ingest log</span></div><div id="ingest"></div></div>
+          <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+            <form class="card pad form" id="pairform" style="gap:16px;padding:20px"><span class="h">Pair a new device</span>
+              <div class="two"><div class="fld"><label class="l">Device ID</label><input class="inp" id="pd-id" placeholder="e.g. ESP-0042" required></div>
+              <div class="fld"><label class="l">Type</label><select class="inp" id="pd-kind"><option>Wrist wearable</option><option>BP cuff</option><option>Glucometer</option><option>Pulse oximeter</option><option>Chest patch</option><option>Thermometer</option><option>Custom</option></select></div></div>
+              <div class="fld"><label class="l">Assign to patient</label><select class="inp" id="pd-pt"></select></div>
+              <div><button class="btn pri" type="submit">Pair device</button></div></form>
+            <div class="card pad"><div class="ch" style="display:flex;justify-content:space-between;margin-bottom:8px"><span class="h">Send readings from hardware</span><button class="chip" id="copycurl">Copy</button></div>
+              <div class="code" id="curl"></div><div class="muted" style="font-size:12px;margin-top:8px">Any device that can make an HTTP request can report. Send any subset of hr, spo2, sys, dia, temp, rr, glu, steps, battery.</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRESCRIPTIONS -->
+      <section class="view" id="v-rx">
+        <div class="rxgrid">
+          <form class="card form" id="rxform" autocomplete="off" novalidate>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="muted" id="rxfor" style="font-size:13px"></div><h3 id="rxtitle">New prescription</h3></div><button type="button" class="chip" id="rxcancel" style="display:none">Cancel edit</button></div>
+            <div class="warnbox" id="allergy"></div>
+            <div class="fld"><label class="l">Medicine name</label><input class="inp" id="f-name" list="meds" placeholder="e.g. Amlodipine"><datalist id="meds"></datalist></div>
+            <div class="three">
+              <div class="fld"><label class="l">Dose</label><input class="inp" id="f-dose" type="number" step="any" min="0" placeholder="5"></div>
+              <div class="fld"><label class="l">Unit</label><select class="inp" id="f-unit"><option>mg</option><option>mcg</option><option>ml</option><option>IU</option><option>tablet(s)</option><option>puff(s)</option><option>drop(s)</option></select></div>
+              <div class="fld"><label class="l">Form</label><select class="inp" id="f-form"><option>Tablet</option><option>Capsule</option><option>Syrup</option><option>Injection</option><option>Inhaler</option><option>Drops</option><option>Ointment</option></select></div>
+            </div>
+            <div class="fld"><label class="l">How often</label>
+              <div class="seg" id="freq"><button type="button" data-n="1">Once daily</button><button type="button" data-n="2">Twice</button><button type="button" data-n="3">Thrice</button><button type="button" data-n="4">4× daily</button><button type="button" data-n="0">As needed</button></div>
+              <div class="slots" id="slots"></div>
+            </div>
+            <div class="fld"><label class="l">Take</label>
+              <div class="seg" id="meal"><button type="button" data-v="Before food">Before food</button><button type="button" data-v="After food">After food</button><button type="button" data-v="With food">With food</button><button type="button" data-v="Any time">Any time</button></div>
+            </div>
+            <div class="two">
+              <div class="fld"><label class="l">Duration (days)</label><input class="inp" id="f-days" type="number" min="1" placeholder="14"><label style="display:flex;gap:8px;align-items:center;margin-top:8px;color:var(--muted);font-size:13px"><input type="checkbox" id="f-ongoing"> Ongoing / long-term</label></div>
+              <div class="fld"><label class="l">Start date</label><input class="inp" id="f-start" type="date"></div>
+            </div>
+            <div class="fld"><label class="l">Instructions for patient</label><textarea class="inp" id="f-notes" placeholder="e.g. Avoid grapefruit. Report dizziness or swelling."></textarea></div>
+            <div style="display:flex;gap:8px"><button class="btn pri" id="rxsave" type="submit">Issue prescription</button><button class="btn sec" type="button" id="rxreset">Clear</button><button class="btn sec" type="button" id="rxprint" style="margin-left:auto">Print / Save as PDF</button></div>
+            <div class="muted" style="font-size:12px">In the print dialog, choose “Save as PDF” as the destination to download it.</div>
+          </form>
+          <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+            <div class="card slip" id="slip"></div>
+            <div class="card pad"><div class="ch" style="display:flex;justify-content:space-between;margin-bottom:16px"><span class="h">Prescriptions</span><span style="display:flex;gap:8px;align-items:center"><span class="muted" id="rxcount" style="font-size:13px"></span><button class="chip" id="rxprintall">Print all active</button></span></div><div id="rxlist"></div></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div id="printarea"></div>
+
+<script>
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const pad2=n=>String(n).padStart(2,'0');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- clinical model ---------- */
+const DOCTOR='Dr. Anika Rao';
+// one vocabulary everywhere: Normal / Watch / Critical
+const V={
+ hr:{lo:60,hi:100,cl:45,ch:130,d:0,u:'bpm',n:'Heart rate'},
+ spo2:{lo:95,hi:100.5,cl:91,ch:101,d:0,u:'%',n:'SpO₂'},
+ sys:{lo:90,hi:130,cl:80,ch:165,d:0,u:'mmHg',n:'Systolic'},
+ dia:{lo:60,hi:85,cl:50,ch:105,d:0,u:'mmHg',n:'Diastolic'},
+ temp:{lo:36.1,hi:37.5,cl:35,ch:39,d:1,u:'°C',n:'Temperature'},
+ rr:{lo:12,hi:20,cl:8,ch:28,d:0,u:'/min',n:'Respiratory rate'},
+ glu:{lo:70,hi:140,cl:54,ch:250,d:0,u:'mg/dL',n:'Glucose (random)'}   // random-sample ranges
+};
+const VITS=[ // default order; tiles are then sorted worst-first
+ {id:'spo2',name:'SpO₂',unit:'%'},{id:'hr',name:'HR',unit:'bpm'},{id:'rr',name:'RR',unit:'/min'},
+ {id:'bp',name:'BP',unit:'mmHg'},{id:'temp',name:'Temp',unit:'°C'},{id:'glu',name:'Glucose',unit:'mg/dL'}];
+const rank={ok:0,warn:1,crit:2};
+const rd=(k,v)=>+(+v).toFixed(V[k].d);                       // judge what is displayed
+const status=(k,v)=>{v=rd(k,v);const t=V[k];return(v<t.cl||v>t.ch)?'crit':(v<t.lo||v>t.hi)?'warn':'ok'};
+const dir=(k,v)=>rd(k,v)<V[k].lo?'low':'high';
+const dev=(k,v)=>{v=rd(k,v);const t=V[k],r=t.hi-t.lo;return v<t.lo?(t.lo-v)/r:v>t.hi?(v-t.hi)/r:0};
+const worse=(a,b)=>rank[a]>=rank[b]?a:b;
+const WORD={ok:'Normal',warn:'Watch',crit:'Critical'};
+function vit(p,id){ // -> {id,name,unit,status,dir,val,dev}
+  const m=VITS.find(x=>x.id===id),c=p.cur;
+  if(id==='bp'){
+    const s1=status('sys',c.sys),s2=status('dia',c.dia),s=worse(s1,s2);
+    const k=rank[s1]>=rank[s2]?'sys':'dia';
+    return{...m,status:s,dir:s==='ok'?'':dir(k,c[k]),val:`${Math.round(c.sys)}/${Math.round(c.dia)}`,dev:Math.max(dev('sys',c.sys),dev('dia',c.dia))};
+  }
+  const s=status(id,c[id]);
+  return{...m,status:s,dir:s==='ok'?'':dir(id,c[id]),val:V[id].d?c[id].toFixed(V[id].d):String(Math.round(c[id])),dev:dev(id,c[id])};
+}
+const allVits=p=>VITS.map(m=>vit(p,m.id));
+const sortWorst=a=>[...a].sort((x,y)=>rank[y.status]-rank[x.status]||y.dev-x.dev);
+const worst=p=>sortWorst(allVits(p))[0];
+const pStatus=p=>worst(p).status;
+const score=p=>{const w=worst(p);return rank[w.status]*10+w.dev};
+
+let P=[],RX=[],DEV=[];const LOG=[];            // all loaded from the server (SQLite)
+const api=(p,o={})=>fetch('/api'+p,{headers:{'content-type':'application/json'},...o}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()});
+const ALLERGY={Penicillin:['penicillin','amoxicillin','ampicillin','co-amoxiclav'],Aspirin:['aspirin','ecosprin','disprin'],Ibuprofen:['ibuprofen','brufen','naproxen','diclofenac'],'Sulfa drugs':['sulfamethoxazole','co-trimoxazole','cotrimoxazole','sulfasalazine'],Codeine:['codeine','co-codamol']};
+const MEDS=['Amlodipine','Atenolol','Atorvastatin','Metoprolol','Losartan','Telmisartan','Furosemide','Spironolactone','Digoxin','Warfarin','Apixaban','Clopidogrel','Metformin','Glimepiride','Insulin glargine','Salbutamol','Budesonide','Tiotropium','Montelukast','Paracetamol','Amoxicillin','Azithromycin','Pantoprazole','Cetirizine','Vitamin D3'];
+
+/* ---------- state ---------- */
+const today=new Date();
+const S={sel:null,filter:'all',q:'',metric:'hr',editId:null,form:{freq:1,slots:['08:00'],meal:'After food'}};
+const sel=()=>P.find(p=>p.id===S.sel)||P[0];
+
+const saveRx=r=>api('/prescriptions/'+encodeURIComponent(r.id),{method:'PUT',body:JSON.stringify(r)}).catch(()=>toast('Could not save — is the server running?'));
+
+/* ---------- patient list: sorted by severity, shows only the worst vital ---------- */
+function renderList(){
+  const sorted=[...P].sort((a,b)=>score(b)-score(a));
+  const list=sorted.filter(p=>(S.filter==='all'||pStatus(p)===S.filter)&&(p.name+' '+p.cond).toLowerCase().includes(S.q.toLowerCase()));
+  const crit=P.filter(p=>pStatus(p)==='crit').length,warn=P.filter(p=>pStatus(p)==='warn').length;
+  $('#pcount').textContent=`${P.length} patients · ${crit} critical · ${warn} watch`;
+  $('#plist').innerHTML=list.map(p=>{const w=worst(p),s=w.status;
+    return `<button class="pt ${p.id===S.sel?'on':''}" data-id="${p.id}">
+      <span class="pn"><b>${p.name}</b><span class="ps"><i class="dot ${s}"></i><em class="${s}">${WORD[s]}</em>· ${p.age} yrs · ${p.cond}</span></span>
+      <span class="pw ${s}">${s==='ok'?'Stable':`${w.name} ${w.val}${w.id==='spo2'?'%':''}`}</span></button>`}).join('')||'<div class="empty">No patients match.</div>';
+}
+
+/* ---------- header, vitals, details ---------- */
+const STALE=30000;
+const ago=t=>{if(!t)return 'never';const s=Math.round((Date.now()-t)/1000);return s<60?`${Math.max(1,s)}s ago`:s<3600?`${Math.round(s/60)}m ago`:`${Math.round(s/3600)}h ago`};
+function devStat(p){
+  const ds=DEV.filter(d=>d.patient_id===p.id),on=ds.filter(d=>Date.now()-d.last_seen<STALE).length,w=ds.find(d=>d.kind==='Wrist wearable');
+  const off=!on;
+  return `<div style="text-align:right;font-size:13px;color:var(--muted);white-space:nowrap"><div style="${off?'color:var(--warn-ink);font-weight:600':''}">${off?'Sensors offline':`${on} of ${ds.length} sensors online`}</div><div>${w&&w.battery!=null?`Wearable battery ${w.battery}% · `:''}last reading ${ago(p.lastTs)}</div></div>`;
+}
+function renderHead(){
+  const p=sel(),s=pStatus(p);
+  $('#phead').innerHTML=`<div><h2>${p.name}</h2><div class="meta"><span><b style="color:var(--ink)">${p.age} yrs</b> · ${p.sex} · Blood ${p.blood} · ${p.cond}</span>${p.allergies.length?p.allergies.map(a=>`<span class="tag">Allergy: ${a}</span>`).join(''):'<span>No known allergies</span>'}</div></div><div style="display:flex;align-items:center;gap:16px">${devStat(p)}<span class="stt ${s}">${WORD[s]}</span></div>`;
+}
+function renderVitals(){
+  const p=sel(),list=sortWorst(allVits(p));
+  $('#vstrip').innerHTML=list.map(v=>`<div class="v ${v.status==='ok'?'':v.status}" title="${V[v.id==='bp'?'sys':v.id].n}${v.id==='glu'?' — random sample, not fasting':''}">
+    <div class="lab">${v.name}<span>${v.unit}</span></div>
+    <div class="num ${v.val.length>5?'long':''}">${v.val}</div>
+    <div class="st">${v.status==='ok'?'Normal':`${WORD[v.status]} · ${v.dir}`}</div></div>`).join('');
+}
+function renderDetails(){
+  const p=sel(),bmi=p.wt/((p.ht/100)**2);
+  $('#det').innerHTML=`<span class="h">Details</span><div class="dg">
+    <div><span>Weight</span><b>${p.wt}<small>kg</small></b></div><div><span>Height</span><b>${p.ht}<small>cm</small></b></div>
+    <div><span>BMI</span><b>${bmi.toFixed(1)}</b></div><div><span>Adherence</span><b>${p.adh}<small>%</small></b></div></div>
+    <div class="note">Glucose is a random (non-fasting) sample.</div>`;
+  const sl=p.sleep,last=sl[sl.length-1],dn=['S','M','T','W','T','F','S'];
+  const bars=sl.map((v,i)=>{const d=dn[(today.getDay()-(sl.length-1-i)+14)%7];return `<div class="${i===sl.length-1?'last':''}" title="${v.toFixed(1)} h"><i style="height:${v/9*72}px"></i>${d}</div>`}).join('');
+  $('#act').innerHTML=`<span class="h">Sleep &amp; activity</span>
+    <div class="big" style="margin-top:8px">${Math.floor(last)}h ${pad2(Math.round((last%1)*60))}<small>last night</small></div>
+    <div class="sleepbars" style="margin-top:8px">${bars}</div>
+    <div style="margin-top:16px;display:flex;justify-content:space-between;align-items:baseline"><span class="h">Steps today</span><span class="muted" style="font-size:13px">goal 8,000</span></div>
+    <div class="big" style="margin-top:4px">${Math.round(p.steps).toLocaleString()}</div>
+    <div class="bar"><i style="width:${clamp(p.steps/8000*100,2,100)}%"></i></div>`;
+}
+
+/* ---------- 24h trends (real pixel size, no stretching) ---------- */
+let tipData=null,hovering=false;
+const hourLbl=i=>pad2((new Date().getHours()-23+i+48)%24)+':00';
+function renderTrend(){
+  const box=$('#trend'),W=box.clientWidth,H=box.clientHeight;if(!W||!H)return;
+  const p=sel(),m=S.metric,L=36,R=8,T=8,B=22;
+  const COL={hr:'#2f5a3c',spo2:'#2b78a0',temp:'#b45309',glu:'#7c5cbf'};
+  const lines=m==='bp'?[{k:'sys',c:'#7c5cbf',n:'Systolic'},{k:'dia',c:'#2f5a3c',n:'Diastolic'}]:[{k:m,c:COL[m],n:V[m].n}];
+  const all=lines.flatMap(l=>p.hist[l.k]);
+  let mn=Math.min(...all),mx=Math.max(...all);const pv=(mx-mn)*.25||1;mn-=pv;mx+=pv;
+  const X=i=>L+i/23*(W-L-R),Y=v=>T+(1-(v-mn)/(mx-mn))*(H-T-B);
+  let g='';
+  for(let i=0;i<4;i++){const v=mn+(mx-mn)*i/3,y=Y(v);g+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="#e8ece6"/><text x="${L-6}" y="${y+4}" text-anchor="end" font-size="12" fill="#55615a">${v.toFixed(m==='temp'?1:0)}</text>`}
+  for(let i=0;i<24;i+=6)g+=`<text x="${X(i)}" y="${H-5}" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#55615a">${hourLbl(i)}</text>`;
+  let band='';
+  if(m!=='bp'){const t=V[m],y1=Y(Math.min(t.hi,mx)),y2=Y(Math.max(t.lo,mn));band=`<rect x="${L}" y="${y1}" width="${W-L-R}" height="${Math.max(0,y2-y1)}" fill="#3f9d62" opacity=".1"/>`}
+  const paths=lines.map(l=>{const d=p.hist[l.k].map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join('');
+    return `<path d="${d}" fill="none" stroke="${l.c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`}).join('');
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" id="tsvg">${g}${band}${paths}<line id="cl" y1="${T}" y2="${H-B}" stroke="#16201a" stroke-dasharray="3 3" opacity="0"/>${lines.map((l,i)=>`<circle id="dot${i}" r="4" fill="#fff" stroke="${l.c}" stroke-width="2" opacity="0"/>`).join('')}</svg><div class="tip" id="tip"></div>`;
+  tipData={lines,X,Y,W,H,p,L,R};
+  $('#legend').innerHTML=lines.map(l=>`<span><i style="background:${l.c}"></i>${l.n} (${V[l.k==='dia'?'sys':l.k].u})</span>`).join('')+(m!=='bp'?`<span style="margin-left:auto"><i style="background:rgba(63,157,98,.3)"></i>Normal range</span>`:'');
+}
+$('#trend').addEventListener('mousemove',e=>{
+  if(!tipData)return;hovering=true;
+  const {lines,X,Y,W,p,L,R}=tipData,r=$('#tsvg').getBoundingClientRect();
+  const i=clamp(Math.round((e.clientX-r.left-L)/(W-L-R)*23),0,23);
+  const cl=$('#cl');cl.setAttribute('x1',X(i));cl.setAttribute('x2',X(i));cl.setAttribute('opacity',.4);
+  lines.forEach((l,k)=>{const d=$('#dot'+k);d.setAttribute('cx',X(i));d.setAttribute('cy',Y(p.hist[l.k][i]));d.setAttribute('opacity',1)});
+  const tip=$('#tip');tip.style.opacity=1;tip.style.left=X(i)+'px';tip.style.top=Y(p.hist[lines[0].k][i])+'px';
+  tip.innerHTML=`<span class="t">${hourLbl(i)}</span> · `+lines.map(l=>`<b>${l.k==='temp'?p.hist[l.k][i].toFixed(1):Math.round(p.hist[l.k][i])}</b> ${V[l.k==='dia'?'sys':l.k].u}`).join(' / ');
+});
+$('#trend').addEventListener('mouseleave',()=>{hovering=false;renderTrend()});
+
+/* ---------- right rail ---------- */
+const TYPES=['Health checkup','Follow-up','Cardiac review','Lab results','Medication review','Dental checkup'];
+function renderToday(){
+  const di=(today.getDay()+6)%7;
+  $('#sdate').textContent=today.toLocaleDateString('en',{weekday:'short',day:'numeric',month:'short'});
+  $('#appts').innerHTML=Array.from({length:4},(_,k)=>({t:`${pad2(9+k*2)}:${k%2?'30':'00'}`,type:TYPES[(di+k*2)%TYPES.length],p:P[(di*3+k*2+1)%P.length]}))
+    .map(x=>`<button class="ap" data-id="${x.p.id}"><span class="t">${x.t}</span><b>${x.p.name}</b><span class="ty">${x.type}</span></button>`).join('');
+}
+function renderAlerts(){
+  const groups=P.map(p=>({p,items:sortWorst(allVits(p)).filter(v=>v.status!=='ok')})).filter(g=>g.items.length)
+    .sort((a,b)=>score(b.p)-score(a.p));
+  const crit=groups.filter(g=>pStatus(g.p)==='crit').length;
+  $('#acount').textContent=groups.length?`${crit} critical · ${groups.length-crit} watch`:'';
+  $('#bdot').style.display=crit?'block':'none';
+  $('#alerts').innerHTML=groups.slice(0,5).map(g=>{const s=pStatus(g.p);
+    return `<button class="alg ${s}" data-id="${g.p.id}"><span class="ah"><b>${g.p.name}</b><em>${WORD[s]}</em></span><span class="at">${g.items.map(v=>`${v.name} ${v.val}${v.id==='spo2'?'%':''} ${v.dir}`).join(' · ')}</span></button>`}).join('')||'<div class="empty">All patients within range.</div>';
+}
+function renderMini(){
+  const L=RX.filter(r=>r.pid===sel().id&&r.status==='active');
+  $('#minirx').innerHTML=L.map(r=>`<div class="mrow"><div><b>${esc(r.name)} ${r.dose} ${esc(r.unit)}</b><span>${r.meal}</span></div><span class="t">${r.slots.length?r.slots.join(' '):'as needed'}</span></div>`).join('')||'<div class="empty">No active medication.</div>';
+}
+
+/* ---------- prescriptions UI ---------- */
+const period=t=>{const h=+t.slice(0,2);return h<5?'Night':h<12?'Morning':h<17?'Afternoon':h<21?'Evening':'Night'};
+const DEF={1:['08:00'],2:['08:00','20:00'],3:['08:00','14:00','21:00'],4:['06:00','12:00','18:00','22:00'],0:[]};
+const f=id=>$('#'+id);
+function renderSlots(){
+  const F=S.form;
+  $$('#freq button').forEach(b=>b.classList.toggle('on',+b.dataset.n===F.freq));
+  $$('#meal button').forEach(b=>b.classList.toggle('on',b.dataset.v===F.meal));
+  $('#slots').innerHTML=(F.freq===0?'<span class="muted" style="padding:8px 2px;font-size:13px">As needed — no fixed times</span>':F.slots.map((t,i)=>`<div class="slot"><span>${period(t)}</span><input type="time" value="${t}" data-i="${i}"><button type="button" data-rm="${i}" title="Remove">×</button></div>`).join(''))+(F.freq===0?'':'<button type="button" class="addslot" id="addslot">+ Add time</button>');
+}
+function formVals(){return{name:f('f-name').value.trim(),dose:f('f-dose').value,unit:f('f-unit').value,form:f('f-form').value,slots:S.form.freq===0?[]:[...S.form.slots].sort(),meal:S.form.meal,days:f('f-ongoing').checked?0:+f('f-days').value||0,start:f('f-start').value,notes:f('f-notes').value.trim()}}
+function renderSlip(){
+  const v=formVals(),p=sel();
+  const al=p.allergies.find(a=>(ALLERGY[a]||[a.toLowerCase()]).some(x=>v.name.toLowerCase().includes(x)));
+  const box=$('#allergy');box.classList.toggle('show',!!al);if(al)box.textContent=`${p.name} is allergic to ${al}. "${v.name}" may cause a reaction — review before issuing.`;
+  $('#slip').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start"><b style="font-size:20px">℞ Prescription</b><div class="muted" style="text-align:right;font-size:13px">${DOCTOR}<br>${today.toLocaleDateString('en',{day:'numeric',month:'short',year:'numeric'})}</div></div>
+   <hr><div class="muted" style="font-size:13px">Patient</div><div style="font-weight:600;margin-top:4px">${p.name} <span class="muted" style="font-weight:400">· ${p.age} yrs · ${p.sex}</span></div>
+   <hr><div class="nm">${v.name?esc(v.name):'<span style="color:#7b877f">Medicine name</span>'}</div>
+   <div class="muted" style="margin-top:4px">${v.dose?`${esc(v.dose)} ${esc(v.unit)}`:'—'} · ${v.form}</div>
+   <dl><dt>Timings</dt><dd class="t" style="font-size:13px">${v.slots.length?v.slots.join(' · '):'As needed'}</dd><dt>Instruction</dt><dd>${v.meal}</dd><dt>Duration</dt><dd>${v.days?v.days+' days':'Ongoing'}</dd><dt>Start</dt><dd>${v.start||'—'}</dd>${v.notes?`<dt>Notes</dt><dd>${esc(v.notes)}</dd>`:''}</dl>
+   <hr><div style="font-family:var(--serif);font-style:italic;font-size:20px;color:var(--green2)">${DOCTOR}</div>`;
+}
+function renderRxList(){
+  const p=sel(),L=RX.filter(r=>r.pid===p.id).sort((a,b)=>(a.status==='stopped')-(b.status==='stopped'));
+  $('#rxcount').textContent=`${L.filter(r=>r.status==='active').length} active`;
+  $('#rxfor').textContent=`For ${p.name}`;
+  $('#rxlist').innerHTML=L.map(r=>`<div class="rxitem ${r.status==='stopped'?'stopped':''}"><div style="min-width:0"><b>${esc(r.name)} ${esc(r.dose)} ${esc(r.unit)}</b><div class="muted" style="font-size:13px">${r.form} · ${r.meal} · ${r.days?r.days+' days':'ongoing'}${r.status==='stopped'?' · stopped':''}</div><div class="times">${r.slots.length?r.slots.map(t=>`<span>${t}</span>`).join(''):'<span style="font-family:var(--sans)">As needed</span>'}</div>${r.notes?`<div class="muted" style="margin-top:8px;font-size:13px">${esc(r.notes)}</div>`:''}</div>
+   <div class="acts"><button data-print="${r.id}">Print</button><button data-edit="${r.id}">Edit</button><button data-stop="${r.id}">${r.status==='stopped'?'Resume':'Stop'}</button></div></div>`).join('')||'<div class="empty">No prescriptions yet for this patient.</div>';
+}
+function resetForm(){
+  S.editId=null;S.form={freq:1,slots:['08:00'],meal:'After food'};
+  ['f-name','f-dose','f-days','f-notes'].forEach(i=>f(i).value='');
+  f('f-unit').selectedIndex=0;f('f-form').selectedIndex=0;f('f-ongoing').checked=false;f('f-days').disabled=false;
+  f('f-start').value=today.toISOString().slice(0,10);
+  $('#rxtitle').textContent='New prescription';$('#rxsave').textContent='Issue prescription';$('#rxcancel').style.display='none';
+  renderSlots();renderSlip();
+}
+function loadForEdit(id){
+  const r=RX.find(x=>x.id===id);if(!r)return;
+  S.editId=id;f('f-name').value=r.name;f('f-dose').value=r.dose;f('f-unit').value=r.unit;f('f-form').value=r.form;
+  S.form={freq:r.slots.length===0?0:Math.min(r.slots.length,4),slots:[...r.slots],meal:r.meal};
+  f('f-ongoing').checked=!r.days;f('f-days').disabled=!r.days;f('f-days').value=r.days||'';f('f-start').value=r.start;f('f-notes').value=r.notes;
+  $('#rxtitle').textContent='Update prescription';$('#rxsave').textContent='Save changes';$('#rxcancel').style.display='';
+  renderSlots();renderSlip();$('.content').scrollTo({top:0,behavior:'smooth'});
+}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2600)}
+
+$('#meds').innerHTML=MEDS.map(m=>`<option value="${m}">`).join('');
+$('#freq').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const n=+b.dataset.n;S.form.freq=n;S.form.slots=[...DEF[n]];renderSlots();renderSlip()});
+$('#meal').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.form.meal=b.dataset.v;renderSlots();renderSlip()});
+$('#slots').addEventListener('input',e=>{if(e.target.dataset.i!==undefined){S.form.slots[+e.target.dataset.i]=e.target.value;renderSlip()}});
+$('#slots').addEventListener('change',()=>renderSlots());
+$('#slots').addEventListener('click',e=>{
+  if(e.target.id==='addslot'){const l=S.form.slots.at(-1)||'08:00';S.form.slots.push(`${pad2((+l.slice(0,2)+4)%24)}:00`);S.form.freq=Math.min(4,S.form.slots.length)||1;renderSlots();renderSlip()}
+  if(e.target.dataset.rm!==undefined){S.form.slots.splice(+e.target.dataset.rm,1);if(!S.form.slots.length)S.form.freq=0;renderSlots();renderSlip()}
+});
+$('#rxform').addEventListener('input',e=>{e.target.classList.remove('bad');renderSlip()});
+f('f-ongoing').addEventListener('change',e=>{f('f-days').disabled=e.target.checked;renderSlip()});
+$('#rxreset').onclick=resetForm;$('#rxcancel').onclick=resetForm;
+$('#rxform').addEventListener('submit',e=>{
+  e.preventDefault();const v=formVals();let bad=false;
+  [['f-name',!v.name],['f-dose',!(+v.dose>0)],['f-days',!f('f-ongoing').checked&&!(v.days>0)]].forEach(([id,b])=>{f(id).classList.toggle('bad',b);bad=bad||b});
+  if(bad){toast('Please fill in medicine, dose and duration');return}
+  if(S.editId){const r=RX.find(r=>r.id===S.editId);Object.assign(r,v);saveRx(r);toast(`Updated ${v.name} for ${sel().name}`)}
+  else{const r={id:'r'+Date.now(),pid:sel().id,status:'active',...v};RX.unshift(r);api('/prescriptions',{method:'POST',body:JSON.stringify(r)}).catch(()=>toast('Could not save — is the server running?'));toast(`Issued ${v.name} to ${sel().name}`)}
+  resetForm();renderRxList();renderMini();
+});
+
+/* ---------- print / save as PDF ---------- */
+function printRx(items){
+  const p=sel(),date=today.toLocaleDateString('en',{day:'numeric',month:'long',year:'numeric'});
+  const rows=items.map((r,i)=>`<div class="item"><b>${i+1}. ${esc(r.name)} ${esc(r.dose)} ${esc(r.unit)}</b> <span>(${esc(r.form)})</span>
+    <div>Timings: ${r.slots.length?r.slots.join(', '):'As needed'} · ${esc(r.meal)} · ${r.days?r.days+' days':'Ongoing'}${r.start?' · from '+esc(r.start):''}</div>
+    ${r.notes?`<div>Note: ${esc(r.notes)}</div>`:''}</div>`).join('');
+  $('#printarea').innerHTML=`<div class="pr"><header><div><h1>Vitalis Clinic</h1><div>${DOCTOR}</div></div><div style="text-align:right"><div class="rxm">℞</div><div>${date}</div></div></header>
+   <div class="box"><div><b>Patient:</b> ${esc(p.name)}</div><div><b>Age / Sex:</b> ${p.age} yrs / ${p.sex}</div>
+   <div><b>Blood group:</b> ${p.blood}</div><div><b>Weight:</b> ${p.wt} kg</div>
+   <div style="grid-column:span 2"><b>Allergies:</b> ${p.allergies.length?p.allergies.map(esc).join(', '):'None known'}</div></div>
+   ${rows}<div class="sign"><div>${DOCTOR}</div></div></div>`;
+  const old=document.title;document.title=`Prescription - ${p.name} - ${date}`;
+  window.onafterprint=()=>{document.title=old};
+  window.print();
+}
+$('#rxprint').onclick=()=>{
+  const v=formVals();
+  if(!v.name||!(+v.dose>0)){f('f-name').classList.toggle('bad',!v.name);f('f-dose').classList.toggle('bad',!(+v.dose>0));toast('Add a medicine name and dose to print');return}
+  printRx([v]);
+};
+$('#rxprintall').onclick=()=>{const L=RX.filter(r=>r.pid===sel().id&&r.status==='active');L.length?printRx(L):toast('No active prescriptions to print')};
+$('#rxlist').addEventListener('click',e=>{
+  const ed=e.target.dataset.edit,st=e.target.dataset.stop,pr=e.target.dataset.print;
+  if(pr)printRx([RX.find(x=>x.id===pr)]);
+  if(ed)loadForEdit(ed);
+  if(st){const r=RX.find(x=>x.id===st);r.status=r.status==='stopped'?'active':'stopped';saveRx(r);renderRxList();renderMini();toast(`${r.name} ${r.status==='stopped'?'stopped':'resumed'}`)}
+});
+
+/* ---------- devices ---------- */
+let apiKey='dev-device-key';
+api('/config').then(c=>{apiKey=c.key;renderCurl()}).catch(()=>{});
+function renderCurl(){
+  const d=DEV[0]?.id||'VT-W1';
+  $('#curl').textContent=`curl -X POST ${location.origin}/api/readings \\\n  -H "x-api-key: ${apiKey}" \\\n  -H "content-type: application/json" \\\n  -d '{"device_id":"${d}","hr":78,"spo2":97}'`;
+}
+function renderDevices(){
+  const now=Date.now(),on=DEV.filter(d=>now-d.last_seen<STALE).length;
+  $('#devcount').textContent=`${on} of ${DEV.length} online`;
+  $('#devtable').innerHTML=DEV.map(d=>{const up=now-d.last_seen<STALE;
+    return `<tr class="${up?'':'off'}"><td class="id">${esc(d.id)}</td><td>${esc(d.kind)}</td><td>${esc(d.patient_name)}</td><td>${d.battery!=null?d.battery+'%':'—'}</td><td>${up?'Online':'Offline'} · ${ago(d.last_seen)}</td></tr>`}).join('')||'<tr><td colspan="5" class="muted">No devices paired.</td></tr>';
+  $('#ingest').innerHTML=LOG.map(e=>`<div class="ing"><span class="t t">${new Date(e.ts).toLocaleTimeString('en',{hour12:false})}</span><span><b>${esc(e.device_id)}</b> → ${esc(e.name)}<br><span class="muted">${Object.entries(e.values).map(([k,v])=>`${METRIC_LABEL[k]} ${k==='temp'?v.toFixed(1):Math.round(v)}`).join(' · ')}${e.steps!=null?` · ${Math.round(e.steps)} steps`:''}</span></span></div>`).join('')||'<div class="empty">Waiting for readings… start sensors with <b>npm run sensors</b>.</div>';
+  const sp=$('#pd-pt');if(!sp.options.length)sp.innerHTML=P.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+}
+$('#pairform').addEventListener('submit',async e=>{
+  e.preventDefault();
+  try{await api('/devices',{method:'POST',body:JSON.stringify({id:$('#pd-id').value.trim(),kind:$('#pd-kind').value,patient_id:+$('#pd-pt').value})});
+    DEV=await api('/devices');$('#pd-id').value='';renderDevices();renderCurl();toast('Device paired — it will appear online after its first reading')}
+  catch(err){toast('Could not pair device')}
+});
+$('#copycurl').onclick=()=>{navigator.clipboard?.writeText($('#curl').textContent).then(()=>toast('Copied'),()=>toast('Copy failed'))};
+
+/* ---------- wiring ---------- */
+function setView(v){if(v==='devices')renderDevices();document.body.dataset.view=v;$$('.nav').forEach(n=>n.classList.toggle('on',n.dataset.nav===v));$('.content').scrollTo({top:0});if(v==='overview')requestAnimationFrame(renderTrend)}
+$$('.nav').forEach(n=>n.onclick=()=>setView(n.dataset.nav));
+$('#goRx').onclick=()=>setView('rx');
+$('#bell').onclick=()=>{setView('overview');$('.rrail').scrollTo({top:0,behavior:'smooth'})};
+function selectPatient(id){
+  S.sel=id;if(S.editId)resetForm();
+  renderList();renderHead();renderVitals();renderDetails();renderTrend();renderMini();renderRxList();renderSlip();
+}
+['#plist','#appts','#alerts'].forEach(s=>$(s).addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(b)selectPatient(+b.dataset.id)}));
+$('#q').addEventListener('input',e=>{S.q=e.target.value;renderList()});
+$('#filters').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;S.filter=b.dataset.f;$$('#filters .chip').forEach(c=>c.classList.toggle('on',c===b));renderList()});
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.metric=b.dataset.m;$$('#tabs button').forEach(x=>x.classList.toggle('on',x===b));renderTrend()});
+
+/* ---------- live data: sensors -> POST /api/readings -> SSE -> here ---------- */
+let conn=false,lastAny=0;
+const METRIC_LABEL={hr:'HR',spo2:'SpO₂',sys:'Sys',dia:'Dia',temp:'Temp',rr:'RR',glu:'Glucose'};
+function refreshAll(){renderList();renderHead();renderVitals();renderAlerts();renderDetails();if(document.body.dataset.view==='devices')renderDevices()}
+function connect(){
+  const es=new EventSource('/api/stream');
+  es.onopen=()=>{conn=true};es.onerror=()=>{conn=false};
+  es.addEventListener('reading',e=>{
+    const d=JSON.parse(e.data),p=P.find(x=>x.id===d.patient_id);if(!p)return;
+    Object.assign(p.cur,d.values);p.lastTs=d.ts;if(d.steps!=null)p.steps=d.steps;lastAny=Date.now();
+    const dv=DEV.find(x=>x.id===d.device_id);if(dv){dv.last_seen=d.ts;if(d.battery!=null)dv.battery=d.battery}
+    LOG.unshift({...d,name:p.name});LOG.length=Math.min(LOG.length,14);
+    refreshAll();
+  });
+}
+setInterval(async()=>{                          // refresh hourly history; live values arrive via the stream
+  try{const fresh=await api('/patients');fresh.forEach(f=>{const p=P.find(x=>x.id===f.id);if(p)p.hist=f.hist});if(!hovering)renderTrend();DEV=await api('/devices')}catch(e){}
+},20000);
+setInterval(()=>{
+  const el=$('#sync'),dot=$('.live i'),s=Math.round((Date.now()-lastAny)/1000);
+  if(!conn){el.textContent='Reconnecting…';dot.style.background='#9aa59d'}
+  else if(lastAny&&s<=15){el.textContent=`Live · ${Math.max(1,s)}s ago`;dot.style.background=''}
+  else{el.textContent=lastAny?`No sensor data · ${s}s`:'Connected · waiting for sensors';dot.style.background='var(--warn)'}
+  if(document.body.dataset.view==='overview')renderHead();
+},1000);
+
+/* ---------- init ---------- */
+async function boot(){
+  try{
+    [P,RX,DEV]=await Promise.all([api('/patients'),api('/prescriptions'),api('/devices')]);
+  }catch(e){
+    document.body.innerHTML='<div style="font-family:system-ui;max-width:480px;margin:20vh auto;padding:24px"><h2>Can’t reach the Vitalis server</h2><p style="margin-top:8px;color:#55615a">Start it with <code>npm start</code> in the clinic-dashboard folder, then open <b>http://localhost:3000</b>.</p></div>';return}
+  P=P.filter(p=>Object.values(p.cur).every(v=>v!=null));          // patients with no readings yet are hidden
+  lastAny=Math.max(0,...P.map(p=>p.lastTs));
+  $('#today').textContent=today.toLocaleDateString('en',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  selectPatient([...P].sort((a,b)=>score(b)-score(a))[0].id);
+  renderToday();renderAlerts();resetForm();renderDevices();connect();
+  addEventListener('resize',renderTrend);
+}
+boot();
+</script>
+</body>
+</html>
