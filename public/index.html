@@ -208,6 +208,123 @@ textarea.inp{resize:vertical;min-height:72px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,24px);background:var(--green);color:#fff;padding:12px 20px;border-radius:8px;opacity:0;transition:.25s;z-index:20}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
+/* new patient */
+.hdrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.newbtn{background:var(--tile);color:var(--green2);font-weight:600;font-size:13px;padding:6px 10px;border-radius:8px;white-space:nowrap}
+.newbtn:hover{background:var(--green);color:#fff}
+.modal{position:fixed;inset:0;background:rgba(22,32,26,.42);display:none;place-items:center;z-index:30;padding:24px}
+.modal.show{display:grid}
+.dialog{width:min(660px,100%);max-height:90vh;overflow:auto;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 24px 60px rgba(16,24,20,.28)}
+.dhead{display:flex;justify-content:space-between;align-items:center}
+.xbtn{width:32px;height:32px;border-radius:8px;font-size:20px;line-height:1}
+.xbtn:hover{background:var(--tile)}
+.dvnote{background:var(--tile);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);line-height:1.55}
+.dvnote b{color:var(--ink)}
+.dfoot{display:flex;gap:8px;justify-content:flex-end}
+.btn:disabled{opacity:.6;cursor:default}
+
+/* wearable view */
+body[data-view=wear] #v-wear{display:block}
+.weargrid{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:16px;align-items:start}
+.wcard{display:flex;flex-direction:column;gap:18px}
+.wtop{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.wgrid{display:grid;grid-template-columns:290px minmax(0,1fr);gap:28px;align-items:center}
+.wcol{display:flex;justify-content:center}
+
+/* watch hardware */
+.watch{position:relative;width:232px}
+.strap{height:56px;background:linear-gradient(180deg,#33423c,#1c2723);margin:0 34px;box-shadow:inset 0 0 0 1px #3f5149}
+.strap.top{border-radius:16px 16px 6px 6px;margin-bottom:-26px}
+.strap.bot{border-radius:6px 6px 16px 16px;margin-top:-26px}
+.case{position:relative;z-index:2;background:linear-gradient(145deg,#31413b,#131c18);border-radius:40px;padding:10px;box-shadow:0 20px 38px rgba(16,24,20,.26),inset 0 0 0 1px #4a5c54}
+.face{background:radial-gradient(120% 100% at 50% 0%,#17231d,#0a0f0d 72%);border-radius:31px;padding:14px 15px 11px;color:#e8f5ee;min-height:212px;overflow:hidden;box-shadow:inset 0 0 22px rgba(0,0,0,.55)}
+.wtoprow{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#82998d}
+.wtime{font-family:var(--mono);letter-spacing:.05em}
+.wlive{display:flex;align-items:center;gap:5px;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.wlive i{width:6px;height:6px;border-radius:50%;background:#5b6f65}
+.wlive.on i{background:#4ade80;box-shadow:0 0 8px #4ade80}
+.whr{display:flex;align-items:baseline;gap:8px;margin-top:8px}
+.whr svg{width:17px;height:17px;fill:none;stroke:#fb7185;stroke-width:2;align-self:center;stroke-linejoin:round}
+.whr.beating svg{animation:beat .8s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}18%{transform:scale(1.24)}34%{transform:scale(1)}}
+.whr b{font-family:var(--serif);font-weight:400;font-size:42px;line-height:1;color:#f5fcf8;font-variant-numeric:tabular-nums}
+.whr small{font-size:12px;color:#8ba396}
+.wecg{width:100%;height:44px;display:block;margin:8px 0 10px;border-radius:8px;background:#080d0b}
+.wtiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.wtile{background:#131d19;border:1px solid #1e2b25;border-radius:10px;padding:6px 7px}
+.wtile span{display:block;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#7f958a}
+.wtile b{font-family:var(--serif);font-weight:400;font-size:16px;color:#eaf6ef}
+.wtile b i{font-style:normal;font-family:var(--sans);font-size:8px;color:#7f958a;margin-left:1px}
+.wfoot{display:flex;justify-content:space-between;font-size:10px;color:#7f958a;margin-top:9px}
+
+/* extraction readout */
+.pipe{display:flex;flex-direction:column;gap:12px;min-width:0}
+.sigbox{background:#080d0b;border-radius:12px;padding:10px 12px}
+.sigbox .lbl{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#6f8a7d;margin-bottom:6px}
+#ppg{width:100%;height:92px;display:block}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{background:var(--tile);border-radius:8px;padding:8px 10px;min-width:0}
+.stat span{display:block;font-size:11px;color:var(--muted)}
+.stat b{font-family:var(--mono);font-size:15px;font-weight:500;white-space:nowrap}
+.stat b small{font-family:var(--sans);color:var(--muted);font-size:11px}
+.wctrl{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tgl{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:#fff;padding:10px 16px;border-radius:8px;font-weight:600}
+.tgl:hover{background:var(--green2)}
+.tgl.off{background:var(--tile);color:var(--ink)}
+.tgl i{width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px rgba(74,222,128,.7)}
+.tgl.off i{background:#9aa59d;box-shadow:none}
+.wnote{font-size:12px;color:var(--muted)}
+
+/* Chancy device mockup */
+.devwrap{display:flex;flex-direction:column;gap:12px}
+.devview{position:relative;background:#0b0f0e;border:8px solid #0b0f0e;border-radius:18px;overflow:hidden;box-shadow:0 16px 30px rgba(16,24,20,.18)}
+.devscreen{position:absolute;left:0;top:0;width:320px;height:240px;transform-origin:top left;background:#f1f4f8;transition:filter .35s,opacity .35s}
+.devscreen.dim{filter:blur(1.5px) brightness(.45)}
+.devflash{position:absolute;inset:0;z-index:3;opacity:0;pointer-events:none;display:grid;place-items:center}
+.devflash.go{animation:devhold 2.6s ease forwards}
+@keyframes devhold{0%{opacity:0}7%{opacity:1}88%{opacity:1}100%{opacity:0}}
+.devflash .fs{position:absolute;inset:0;background:#fff;animation:devpulse 2.6s ease-out}
+@keyframes devpulse{0%,100%{background:#f4fffb}10%{background:#d5f9e9}20%{background:#fff}30%{background:#d5f9e9}40%{background:#fff}60%{background:#eafff5}}
+.devflash .fm{position:relative;text-align:center;color:#0c3a28;padding:0 18px;transform:translateY(4px);animation:devmsg 2.6s ease forwards}
+.devflash .fm b{display:block;font-size:11px;letter-spacing:.22em;color:#0f766e}
+.devflash .fm em{display:block;font-style:normal;font-family:var(--serif);font-size:30px;line-height:1.15;margin:2px 0 4px}
+.devflash .fm span{display:block;font-size:11px;color:#276b52}
+.devflash .fm .ok{width:34px;height:34px;border-radius:50%;background:#0d9488;display:grid;place-items:center;margin:0 auto 8px}
+.devflash .fm .ok svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.4}
+@keyframes devmsg{0%{opacity:0;transform:translateY(12px)}18%,62%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-8px)}}
+
+/* the 320x240 screen itself, laid out like the firmware */
+.ds{position:relative;width:320px;height:240px;overflow:hidden;font-family:'Figtree',system-ui,sans-serif;color:#1e293b}
+.ds-card{position:absolute;left:6px;top:6px;width:92px;height:228px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 2px 0 #dee3eb}
+.ds-hello{position:absolute;left:6px;top:13px;width:92px;text-align:center;font-size:10px;color:#64748b}
+.ds-name{position:absolute;left:4px;top:27px;width:96px;text-align:center;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-hr{position:absolute;left:20px;top:50px;width:64px;border-top:1px solid #e2e8f0}
+.ds-mascot{position:absolute;left:7px;top:84px;width:90px;height:146px;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(1px)}50%{transform:translateY(-2px)}}
+.ds-title{position:absolute;left:106px;top:8px;font-size:15px;font-weight:700;letter-spacing:-.01em}
+.ds-col{position:absolute;top:34px;font-size:8px;letter-spacing:.07em;color:#94a3b8}
+.ds-row{position:absolute;left:106px;width:208px;height:28px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;box-sizing:border-box}
+.ds-row.on{background:#e0f6f2;border-color:#0d9488}
+.ds-row.on:before{content:'';position:absolute;left:1px;top:5px;width:3px;height:16px;border-radius:1px;background:#0d9488}
+.ds-nm{position:absolute;left:8px;top:1px;font-size:11px;font-weight:700;line-height:1.2;white-space:nowrap}
+.ds-st{position:absolute;left:8px;top:17px;font-size:8px;color:#64748b;white-space:nowrap}
+.ds-time{position:absolute;left:88px;top:6px;width:56px;height:16px;border-radius:8px;background:#f1f5f9;display:flex;align-items:center;gap:3px;font-size:8px;padding-left:5px;box-sizing:border-box}
+.ds-row.on .ds-time{background:#fff}
+.ds-ic{width:5px;height:5px;border-radius:50%;background:#f59e0b;flex:none}
+.ds-ic.moon{background:#6366f1}
+.ds-dose{position:absolute;left:146px;top:7px;font-size:11px;font-weight:700;white-space:nowrap}
+.ds-dose small{font-size:8px;font-weight:400;color:#64748b;margin-left:2px}
+.ds-bubble{position:absolute;left:107px;top:202px;width:213px;height:36px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-sizing:border-box;padding:5px 8px 4px;overflow:hidden}
+.ds-bubble:before{content:'';position:absolute;left:-6px;top:11px;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-right:6px solid #fff}
+.ds-line1{font-size:10px;font-weight:700;color:#0d9488;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-line2{font-size:9px;color:#1e293b;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-prog{position:absolute;left:8px;bottom:3px;width:197px;height:1px;background:#e2e8f0}
+.ds-prog i{display:block;height:1px;background:#0d9488;animation:devprog 6s linear infinite}
+@keyframes devprog{from{width:0}to{width:100%}}
+.ds-empty{position:absolute;left:106px;top:60px;width:208px;padding:24px 12px;text-align:center;color:#94a3b8;font-size:11px;background:#fff;border:1px dashed #dbe3ea;border-radius:10px}
+@media (max-width:1340px){.weargrid{grid-template-columns:1fr}.devwrap{max-width:440px}}
+@media (max-width:1160px){.wgrid{grid-template-columns:1fr}.watch{margin:8px auto}}
+
 #printarea{display:none}
 @media print{
   @page{margin:16mm}
@@ -242,12 +359,13 @@ textarea.inp{resize:vertical;min-height:72px}
     <button class="nav on" data-nav="overview" title="Overview"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg></button>
     <button class="nav" data-nav="rx" title="Prescriptions"><svg viewBox="0 0 24 24"><path d="M10.5 20.5 3.5 13.5a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg></button>
     <button class="nav" data-nav="devices" title="Devices"><svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></button>
+    <button class="nav" data-nav="wear" title="Wearable"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 6V3h6v3M9 18v3h6v-3"/><path d="M12 9v3l2 1"/></svg></button>
     <div class="sp"></div>
     <div class="me" title="Dr. Anika Rao">AR</div>
   </nav>
 
   <aside class="card plist">
-    <div class="hd"><b>Patients</b><span class="muted" id="pcount" style="font-size:13px"></span></div>
+    <div class="hd"><div class="hdrow"><b>Patients</b><button class="newbtn" id="newpt" title="Add a patient">+ New</button></div><span class="muted" id="pcount" style="font-size:13px"></span></div>
     <div class="filters" id="filters"><button class="chip on" data-f="all">All</button><button class="chip" data-f="crit">Critical</button><button class="chip" data-f="warn">Watch</button></div>
     <div class="plist-scroll" id="plist"></div>
   </aside>
@@ -299,6 +417,63 @@ textarea.inp{resize:vertical;min-height:72px}
         </div>
       </section>
 
+      <!-- WEARABLE / SMARTWATCH MOCKUP + CHANCY DEVICE SCREEN -->
+      <section class="view" id="v-wear">
+        <div class="weargrid">
+          <div class="card pad wcard">
+            <div class="wtop"><span class="h">Smartwatch extraction</span><span class="muted" id="watchdev" style="font-size:13px"></span></div>
+            <div class="wgrid">
+              <div class="wcol">
+                <div class="watch">
+                  <div class="strap top"></div>
+                  <div class="case"><div class="face">
+                    <div class="wtoprow"><span class="wtime" id="wtime">08:41</span><span class="wlive" id="wlive"><i></i>off</span></div>
+                    <div class="whr" id="whrbox"><svg viewBox="0 0 24 24"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1Z"/></svg><b id="whr">76</b><small>bpm</small></div>
+                    <canvas id="wecg" width="320" height="44" class="wecg"></canvas>
+                    <div class="wtiles">
+                      <div class="wtile"><span>SpO₂</span><b id="wspo2">98<i>%</i></b></div>
+                      <div class="wtile"><span>Resp</span><b id="wrr">15<i>/min</i></b></div>
+                      <div class="wtile"><span>Temp</span><b id="wtemp">36.7<i>°C</i></b></div>
+                    </div>
+                    <div class="wfoot"><span id="wsteps">1,200 steps</span><span id="wbatt">88% battery</span></div>
+                  </div></div>
+                  <div class="strap bot"></div>
+                </div>
+              </div>
+              <div class="pipe">
+                <div class="sigbox">
+                  <div class="lbl"><span>PPG signal · raw</span><span id="wsig">no contact</span></div>
+                  <canvas id="ppg" width="560" height="96"></canvas>
+                </div>
+                <div class="stats">
+                  <div class="stat"><span>Peaks detected</span><b id="wpeaks">0</b></div>
+                  <div class="stat"><span>R–R interval</span><b id="wrrms">— <small>ms</small></b></div>
+                  <div class="stat"><span>Signal quality</span><b id="wq">— <small>%</small></b></div>
+                  <div class="stat"><span>Skin contact</span><b id="wcontact">—</b></div>
+                </div>
+                <div>
+                  <div class="wnote" style="margin-bottom:6px">Last packet posted to <span class="t">/api/readings</span></div>
+                  <div class="code" id="packet" style="padding:10px;font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-all">Waiting for the watch…</div>
+                </div>
+                <div class="wctrl"><button class="tgl off" id="wtoggle"><i></i><span>Start extraction</span></button><span class="wnote" id="wnote">Mockup only — readings use the paired watch’s device key.</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card pad">
+            <div class="wtop"><span class="h">Chancy device</span><span class="muted" id="devlbl" style="font-size:13px"></span></div>
+            <div class="devwrap" style="margin-top:12px">
+              <div class="devview" id="devview"><div class="devscreen" id="devscreen"></div><div class="devflash" id="devflash"></div></div>
+              <div class="wctrl">
+                <button class="btn pri" id="mkritu">Create Ritu &amp; flash device</button>
+                <button class="btn sec" id="flashnow">Flash again</button>
+              </div>
+              <div class="wnote" id="devinfo">320 × 240 · mirrors the firmware screen. When a patient is created in the dashboard, their name flashes here and their schedule loads.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- PRESCRIPTIONS -->
       <section class="view" id="v-rx">
         <div class="rxgrid">
@@ -334,6 +509,28 @@ textarea.inp{resize:vertical;min-height:72px}
       </section>
     </div>
   </div>
+</div>
+<div class="modal" id="npmodal">
+  <form class="dialog card" id="npform" autocomplete="off">
+    <div class="dhead"><span class="h">New patient</span><button type="button" class="xbtn" id="npcancel" title="Close">×</button></div>
+    <div class="wnote" style="margin-top:-8px">Adds a wrist wearable, a 24h baseline and the Chancy medication schedule. The hardware screen flashes when the patient appears.</div>
+    <div class="two">
+      <div class="fld"><label class="l">Full name</label><input class="inp" id="np-name" required></div>
+      <div class="fld"><label class="l">Condition</label><input class="inp" id="np-cond"></div>
+    </div>
+    <div class="three">
+      <div class="fld"><label class="l">Age</label><input class="inp" id="np-age" type="number" min="0" max="120"></div>
+      <div class="fld"><label class="l">Sex</label><select class="inp" id="np-sex"><option value="F">Female</option><option value="M">Male</option><option value="O">Other</option></select></div>
+      <div class="fld"><label class="l">Blood group</label><select class="inp" id="np-blood"><option>O+</option><option>O−</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option></select></div>
+    </div>
+    <div class="three">
+      <div class="fld"><label class="l">Weight (kg)</label><input class="inp" id="np-wt" type="number" step="0.1"></div>
+      <div class="fld"><label class="l">Height (cm)</label><input class="inp" id="np-ht" type="number" step="1"></div>
+      <div class="fld"><label class="l">Wrist wearable</label><input class="inp" id="np-dev" value="Paired automatically" readonly style="color:var(--muted)"></div>
+    </div>
+    <div class="dvnote" id="np-rx"></div>
+    <div class="dfoot"><button type="button" class="btn sec" id="npcancel2">Cancel</button><button class="btn pri" id="npsave" type="submit">Create patient &amp; flash device</button></div>
+  </form>
 </div>
 <div class="toast" id="toast"></div>
 <div id="printarea"></div>
@@ -607,7 +804,7 @@ function renderDevices(){
   $('#devtable').innerHTML=DEV.map(d=>{const up=now-d.last_seen<STALE;
     return `<tr class="${up?'':'off'}"><td class="id">${esc(d.id)}</td><td>${esc(d.kind)}</td><td>${esc(d.patient_name)}</td><td>${d.battery!=null?d.battery+'%':'—'}</td><td>${up?'Online':'Offline'} · ${ago(d.last_seen)}</td></tr>`}).join('')||'<tr><td colspan="5" class="muted">No devices paired.</td></tr>';
   $('#ingest').innerHTML=LOG.map(e=>`<div class="ing"><span class="t t">${new Date(e.ts).toLocaleTimeString('en',{hour12:false})}</span><span><b>${esc(e.device_id)}</b> → ${esc(e.name)}<br><span class="muted">${Object.entries(e.values).map(([k,v])=>`${METRIC_LABEL[k]} ${k==='temp'?v.toFixed(1):Math.round(v)}`).join(' · ')}${e.steps!=null?` · ${Math.round(e.steps)} steps`:''}</span></span></div>`).join('')||'<div class="empty">Waiting for readings… start sensors with <b>npm run sensors</b>.</div>';
-  const sp=$('#pd-pt');if(!sp.options.length)sp.innerHTML=P.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  const sp=$('#pd-pt'),cur=sp.value;sp.innerHTML=P.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');if(cur)sp.value=cur;
 }
 $('#pairform').addEventListener('submit',async e=>{
   e.preventDefault();
@@ -617,14 +814,279 @@ $('#pairform').addEventListener('submit',async e=>{
 });
 $('#copycurl').onclick=()=>{navigator.clipboard?.writeText($('#curl').textContent).then(()=>toast('Copied'),()=>toast('Copy failed'))};
 
+/* ============================================================
+   SMARTWATCH MOCKUP + CHANCY HARDWARE SCREEN
+   The watch draws a synthetic PPG, extracts HR / SpO2 / RR / temp
+   and POSTs them to /api/readings exactly like the firmware would.
+   ============================================================ */
+const RITU_RX=[
+  {name:'Metformin',dose:'500',unit:'mg',form:'Tablet',slots:['08:00'],meal:'With food'},
+  {name:'Amlodipine',dose:'5',unit:'mg',form:'Tablet',slots:['09:00'],meal:'After food'},
+  {name:'Vitamin D3',dose:'1000',unit:'IU',form:'Capsule',slots:['13:00'],meal:'After food'},
+  {name:'Paracetamol',dose:'500',unit:'mg',form:'Tablet',slots:['18:00'],meal:'Any time'},
+  {name:'Atorvastatin',dose:'10',unit:'mg',form:'Tablet',slots:['21:00'],meal:'After food'}];
+const RITU={name:'Ritu',age:42,sex:'F',cond:'Type 2 diabetes',blood:'B+',wt:62,ht:160,adh:92,steps:1200};
+const PILL_COUNT={Paracetamol:2};
+
+const W={on:false,pid:null,dev:'',base:{hr:76,spo2:98,rr:15,temp:36.7},bpm:76,spo2:98,rr:15,temp:36.7,batt:88,steps:1200,peaks:0,rrms:790,quality:0,contact:false,sentAt:0};
+let devIdx=0,flashTO=null,lastLocal={id:null,at:0};
+
+const fmtClock=t=>{if(!t)return '—';const[h,m]=t.split(':').map(Number);const h12=h%12===0?12:h%12;return `${h12}:${pad2(m)} ${h<12?'AM':'PM'}`};
+const fmtStrength=m=>`${m.dose} ${m.unit}`.trim();
+
+/* Chancy, redrawn as SVG (colours and proportions from chancy.cpp) */
+const CHANCY_SVG=`<svg viewBox="0 0 90 146" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<ellipse cx="31" cy="127" rx="10.5" ry="5.5" fill="#d47496"/><ellipse cx="59" cy="127" rx="10.5" ry="5.5" fill="#d47496"/>
+<ellipse cx="31" cy="126.5" rx="9.3" ry="4.4" fill="#ee98ba"/><ellipse cx="59" cy="126.5" rx="9.3" ry="4.4" fill="#ee98ba"/>
+<path d="M21 92 L9 97" stroke="#d47496" stroke-width="14" stroke-linecap="round"/><path d="M21 92 L9 97" stroke="#fac2d5" stroke-width="11.5" stroke-linecap="round"/>
+<path d="M70 93 L82 87" stroke="#d47496" stroke-width="14" stroke-linecap="round"/><path d="M70 93 L82 87" stroke="#fac2d5" stroke-width="11.5" stroke-linecap="round"/>
+<ellipse cx="45" cy="88" rx="35.6" ry="41.6" fill="#d47496"/><ellipse cx="45" cy="88" rx="34" ry="40" fill="#f0a8c4"/>
+<ellipse cx="42.5" cy="85" rx="30.5" ry="35.5" fill="#fac2d5"/><ellipse cx="46" cy="104" rx="21.8" ry="18.4" fill="#ffe8f0"/>
+<ellipse cx="28.7" cy="65.5" rx="5.5" ry="3.2" fill="#ffd6e4"/><circle cx="24.6" cy="63" r="1.4" fill="#fff"/>
+<path d="M30 93.6 Q45 109.6 60 93.6" fill="none" stroke="#64748b" stroke-width="2.1"/><path d="M47.2 101 Q54 105.6 53 112.6" fill="none" stroke="#64748b" stroke-width="2.1"/>
+<circle cx="53" cy="114.2" r="3.6" fill="#64748b"/><circle cx="53" cy="114.2" r="2.5" fill="#cbd5e1"/><circle cx="52.2" cy="113.2" r=".8" fill="#fff"/>
+<rect x="34" y="37.5" width="22" height="18" rx="9.6" fill="#c8d2de"/><rect x="35.2" y="38.7" width="19.6" height="15.6" rx="8.4" fill="#fff"/>
+<rect x="43.3" y="41.4" width="3.4" height="8.4" rx="1.7" fill="#e63c50"/><rect x="41.1" y="43.6" width="7.8" height="3.4" rx="1.7" fill="#e63c50"/>
+<ellipse cx="24" cy="83" rx="5.6" ry="3" fill="#f684a8" opacity=".9"/><ellipse cx="66" cy="83" rx="5.6" ry="3" fill="#f684a8" opacity=".9"/>
+<ellipse cx="34" cy="74.8" rx="3.3" ry="4.4" fill="#34283e"/><ellipse cx="56" cy="74.8" rx="3.3" ry="4.4" fill="#34283e"/>
+<circle cx="33" cy="73.1" r="1.25" fill="#fff"/><circle cx="55" cy="73.1" r="1.25" fill="#fff"/><circle cx="35.2" cy="76.2" r=".6" fill="#fff"/><circle cx="57.2" cy="76.2" r=".6" fill="#fff"/>
+<path d="M41.4 87.2 Q45 90.8 48.6 87.2" fill="none" stroke="#802c46" stroke-width="1.8" stroke-linecap="round"/>
+<g transform="rotate(-22 82 82)"><rect x="76" y="78" width="13" height="8" rx="4" fill="#d47496"/><rect x="76.6" y="78.6" width="12" height="6.8" rx="3.4" fill="#e63c50"/><rect x="76.6" y="78.6" width="6" height="6.8" rx="3.4" fill="#fff"/></g>
+<ellipse cx="82" cy="86" rx="5.2" ry="5" fill="#d47496"/><ellipse cx="82" cy="86" rx="4" ry="3.8" fill="#fac2d5"/>
+</svg>`;
+
+/* ---------- Chancy screen (320 x 240, mirrors the firmware layout) ---------- */
+function deviceMeds(p){
+  return RX.filter(r=>r.pid===p.id&&r.status==='active')
+    .sort((a,b)=>(a.slots[0]||'99').localeCompare(b.slots[0]||'99'))
+    .slice(0,5)
+    .map(r=>({name:r.name,strength:fmtStrength(r),count:PILL_COUNT[r.name]??1,form:r.form,time:r.slots[0]||'09:00'}));
+}
+function renderDevice(){
+  const p=sel();if(!p)return;
+  const meds=deviceMeds(p);
+  if(devIdx>=meds.length)devIdx=0;
+  const rows=meds.map((m,i)=>`<div class="ds-row ${i===devIdx?'on':''}" style="top:${46+i*31}px">
+      <div class="ds-nm">${esc(m.name)}</div><div class="ds-st">${esc(m.strength)}</div>
+      <div class="ds-time"><i class="ds-ic ${+m.time.slice(0,2)>=6&&+m.time.slice(0,2)<18?'':'moon'}"></i><span>${fmtClock(m.time)}</span></div>
+      <div class="ds-dose">${m.count} <small>${m.form==='Capsule'?'capsule':'pill'}${m.count===1?'':'s'}</small></div></div>`).join('');
+  const m=meds[devIdx];
+  const bub=m?`<div class="ds-bubble"><div class="ds-line1">${esc(p.name)}, don’t forget your ${esc(m.name)}!</div>
+      <div class="ds-line2">Take ${m.count} ${m.form==='Capsule'?'capsule':'pill'}${m.count===1?'':'s'} of ${esc(m.strength)} at ${fmtClock(m.time)}</div>
+      <div class="ds-prog"><i></i></div></div>`:'';
+  $('#devscreen').innerHTML=`<div class="ds">
+      <div class="ds-card"></div><div class="ds-hello">Hello,</div>
+      <div class="ds-name" style="font-size:${p.name.length>10?11:p.name.length>8?13:15}px">${esc(p.name)}</div><div class="ds-hr"></div>
+      <div class="ds-mascot">${CHANCY_SVG}</div>
+      <div class="ds-title">Today's medicines</div>
+      <div class="ds-col" style="left:114px">MEDICINE</div><div class="ds-col" style="left:198px">TIME</div><div class="ds-col" style="left:256px">DOSE</div>
+      ${rows||'<div class="ds-empty">No active medication for this patient.</div>'}
+      ${bub}
+    </div>`;
+  $('#devlbl').textContent=`${p.name} · ${meds.length} medicine${meds.length===1?'':'s'}`;
+  $('#devinfo').textContent=`320 × 240 · mirrors the Chancy firmware. ${p.name}’s schedule comes from the dashboard prescriptions.`;
+  sizeDevice();
+}
+function sizeDevice(){
+  const v=$('#devview'),s=$('#devscreen');if(!v||!s)return;
+  const w=v.clientWidth;if(!w)return;
+  const k=w/320;s.style.transform=`scale(${k})`;v.style.height=Math.round(240*k)+'px';
+}
+function flashDevice(name){
+  const f=$('#devflash'),s=$('#devscreen');if(!f)return;
+  f.innerHTML=`<div class="fs"></div><div class="fm"><div class="ok"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><b>NEW PATIENT</b><em>${esc(name)}</em><span>Paired to Chancy · wrist wearable reporting</span></div>`;
+  s.classList.add('dim');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');
+  clearTimeout(flashTO);flashTO=setTimeout(()=>{s.classList.remove('dim');f.classList.remove('go')},2600);
+}
+setInterval(()=>{
+  if(document.body.dataset.view!=='wear'||!P.length)return;
+  const meds=deviceMeds(sel());
+  if(meds.length){devIdx=(devIdx+1)%meds.length;renderDevice()}
+},6000);
+
+/* ---------- watch: synthetic PPG -> extracted vitals -> POST ---------- */
+const pulseAt=ph=>0.95*Math.exp(-Math.pow((ph-.12)/.055,2))+0.3*Math.exp(-Math.pow((ph-.4)/.08,2))
+  -0.12*Math.exp(-Math.pow((ph-.52)/.05,2))+0.05*Math.exp(-Math.pow((ph-.75)/.2,2));
+
+function startWatch(){
+  const p=sel();if(!p)return;
+  const d=DEV.find(x=>x.patient_id===p.id&&x.kind==='Wrist wearable')||DEV.find(x=>x.patient_id===p.id);
+  W.on=true;W.pid=p.id;W.dev=d?.id||`VT-W${p.id}`;
+  W.base={hr:clamp(+(p.cur?.hr??76),45,140),spo2:clamp(+(p.cur?.spo2??98),90,100),rr:clamp(+(p.cur?.rr??15),8,30),temp:clamp(+(p.cur?.temp??36.7),35,39)};
+  W.bpm=W.base.hr;W.spo2=W.base.spo2;W.rr=W.base.rr;W.temp=W.base.temp;
+  W.batt=d?.battery??88;W.steps=Math.round(p.steps||0);W.sentAt=0;W.peaks=0;W.quality=96;W.contact=true;
+  $('#wtoggle').classList.remove('off');$('#wtoggle').querySelector('span').textContent='Stop extraction';
+  $('#wlive').classList.add('on');$('#wlive').lastChild.textContent='live';
+  $('#whrbox').classList.add('beating');
+  renderWatch();
+}
+function stopWatch(){
+  W.on=false;W.contact=false;W.quality=0;
+  $('#wtoggle').classList.add('off');$('#wtoggle').querySelector('span').textContent='Start extraction';
+  $('#wlive').classList.remove('on');$('#wlive').lastChild.textContent='off';
+  $('#whrbox').classList.remove('beating');
+  renderWatch();
+}
+function renderWatch(){
+  const p=sel();
+  $('#watchdev').textContent=W.on?`${W.dev} · ${p?p.name:''}`:'Idle — start the mockup';
+  $('#wtime').textContent=new Date().toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit',hour12:false});
+  $('#whr').textContent=Math.round(W.bpm);
+  $('#wspo2').innerHTML=`${Math.round(W.spo2)}<i>%</i>`;
+  $('#wrr').innerHTML=`${Math.round(W.rr)}<i>/min</i>`;
+  $('#wtemp').innerHTML=`${W.temp.toFixed(1)}<i>°C</i>`;
+  $('#wsteps').textContent=`${Math.round(W.steps).toLocaleString()} steps`;
+  $('#wbatt').textContent=`${Math.round(W.batt)}% battery`;
+  $('#wpeaks').textContent=W.peaks;
+  $('#wrrms').innerHTML=W.on?`${Math.round(W.rrms)} <small>ms</small>`:'— <small>ms</small>';
+  $('#wq').innerHTML=W.on?`${Math.round(W.quality)} <small>%</small>`:'— <small>%</small>';
+  $('#wcontact').textContent=W.on?'Skin contact':'No contact';
+  $('#wsig').textContent=W.on?'streaming':'no contact';
+  $('#wnote').textContent=W.on?`Sending every 2.5 s as ${W.dev}.`:'Mockup only — readings use the paired watch’s device key.';
+}
+let lastBeat=-1;
+function drawSignals(now){
+  const t=now/1000,on=W.on;
+  if(on){
+    W.bpm=clamp(W.base.hr+Math.sin(t*.55)*2.2+Math.sin(t*1.7)*.8,42,140);
+    W.spo2=clamp(W.base.spo2+Math.sin(t*.35)*.7-.4,90,100);
+    W.rr=clamp(W.base.rr+Math.sin(t*.5)*1.2,8,30);
+    W.temp=clamp(W.base.temp+Math.sin(t*.12)*.12,35,39);
+    W.quality=clamp(97+Math.sin(t*.9)*2,88,99);
+    const beat=Math.floor(t/(60/W.bpm));
+    if(beat!==lastBeat){lastBeat=beat;W.peaks++;W.rrms=(60/W.bpm)*1000}
+  }
+  const c=$('#ppg');if(!c)return;
+  const x=c.getContext('2d'),w=c.width,h=c.height;
+  x.fillStyle='#080d0b';x.fillRect(0,0,w,h);
+  x.strokeStyle='#13231c';x.lineWidth=1;
+  for(let i=1;i<4;i++){x.beginPath();x.moveTo(0,h*i/4);x.lineTo(w,h*i/4);x.stroke()}
+  const period=on?60/W.bpm:.82,amp=on?1:.22,scroll=230;
+  x.strokeStyle=on?'#5eead4':'#33463e';x.lineWidth=2;x.beginPath();
+  for(let i=0;i<w;i++){
+    const tt=t-(w-i)/scroll,ph=((tt/period)%1+1)%1;
+    const v=pulseAt(ph)*amp+Math.sin(i*.33+t*9)*.006;
+    const y=h*.64-v*h*.48;i?x.lineTo(i,y):x.moveTo(i,y);
+  }
+  x.stroke();
+  if(on){
+    x.fillStyle='#a7f3d0';
+    for(let i=0;i<w;i++){
+      const tt=t-(w-i)/scroll,ph=((tt/period)%1+1)%1;
+      if(ph>.10&&ph<.145){const y=h*.64-pulseAt(.125)*h*.48;x.beginPath();x.arc(i,y,1.6,0,7);x.fill()}
+    }
+  }
+  const e=$('#wecg');if(e){
+    const y2=e.getContext('2d'),ew=e.width,eh=e.height;
+    y2.clearRect(0,0,ew,eh);
+    y2.strokeStyle=on?'#6ee7b7':'#2a3a34';y2.lineWidth=1.6;y2.beginPath();
+    for(let i=0;i<ew;i++){
+      const tt=t-(ew-i)/150,ph=((tt/period)%1+1)%1;
+      const v=pulseAt(ph)*(on?1:.2),yy=eh*.66-v*eh*.5;
+      i?y2.lineTo(i,yy):y2.moveTo(i,yy);
+    }
+    y2.stroke();
+  }
+  if(W.sentAt&&Date.now()-W.sentAt>4000&&on)$('#wnote').textContent=`Sending every 2.5 s as ${W.dev}.`;
+}
+let wearRAF=0;
+(function loop(){wearRAF=requestAnimationFrame(loop);if(document.body.dataset.view==='wear')drawSignals(performance.now())})();
+
+function sendWatch(){
+  if(!W.on||!W.dev)return;
+  const body={device_id:W.dev,ts:Date.now(),hr:Math.round(W.bpm),spo2:+W.spo2.toFixed(1),rr:Math.round(W.rr),temp:+W.temp.toFixed(1),battery:Math.round(W.batt),steps:Math.round(W.steps)};
+  W.sentAt=Date.now();
+  $('#packet').textContent=JSON.stringify(body,null,1);
+  W.batt=Math.max(5,W.batt-.02);W.steps+=Math.max(1,Math.round(W.bpm/22));
+  fetch('/api/readings',{method:'POST',headers:{'content-type':'application/json','x-api-key':apiKey},body:JSON.stringify(body)})
+    .then(r=>{if(!r.ok)throw new Error(r.status)})
+    .catch(()=>{$('#wsig').textContent='post failed'});
+}
+setInterval(()=>{if(W.on)sendWatch()},2500);
+setInterval(()=>{if(document.body.dataset.view==='wear')renderWatch()},900);
+$('#wtoggle').onclick=()=>W.on?stopWatch():startWatch();
+
+function renderWear(){
+  renderWatch();renderDevice();
+  const mk=$('#mkritu');if(mk)mk.style.display=P.some(p=>p.name==='Ritu')?'none':'';
+  requestAnimationFrame(sizeDevice);
+}
+
+/* ---------- create a patient from the dashboard ---------- */
+function rituBody(){
+  return {...RITU,allergies:[],vitals:{hr:76,spo2:98,sys:118,dia:76,temp:36.7,rr:15,glu:98},
+    devices:[{kind:'Wrist wearable'}],rx:RITU_RX};
+}
+async function afterNewPatient(id,name){
+  try{[P,DEV,RX]=await Promise.all([api('/patients'),api('/devices'),api('/prescriptions')])}catch(e){}
+  S.sel=id;devIdx=0;lastLocal={id,at:Date.now()};
+  setView('wear');
+  renderList();renderHead();renderVitals();renderDetails();renderTrend();renderMini();renderRxList();renderSlip();renderAlerts();renderDevices();
+  renderDevice();flashDevice(name);
+  if(!W.on)startWatch();
+  $('#mkritu').style.display=P.some(p=>p.name==='Ritu')?'none':'';
+}
+async function createNewPatient(body){
+  const r=await api('/patients',{method:'POST',body:JSON.stringify(body)});
+  lastLocal={id:r.patient.id,at:Date.now()};
+  await afterNewPatient(r.patient.id,r.patient.name);
+  return r.patient;
+}
+function existingRitu(){return P.find(p=>p.name==='Ritu')}
+
+$('#mkritu').onclick=async()=>{
+  const b=$('#mkritu'),old=b.textContent;b.disabled=true;b.textContent='Creating…';
+  try{const pt=await createNewPatient(rituBody());toast(`Created ${pt.name} · Chancy screen flashing`)}
+  catch(err){
+    if(err.message==='409'){const p=existingRitu();if(p){await afterNewPatient(p.id,p.name);toast(`${p.name} already exists — flashed her device`)}else toast('A patient with that name already exists')}
+    else toast('Could not create patient — is the server running?');
+  }finally{b.disabled=false;b.textContent=old}
+};
+$('#flashnow').onclick=()=>{const p=sel();if(p)flashDevice(p.name)};
+
+/* new-patient dialog */
+function openNewPatient(){
+  const set=(id,v)=>{const el=$('#'+id);if(el)el.value=v};
+  set('np-name',RITU.name);set('np-cond',RITU.cond);set('np-age',RITU.age);set('np-wt',RITU.wt);set('np-ht',RITU.ht);
+  $('#np-sex').value=RITU.sex;$('#np-blood').value=RITU.blood;
+  $('#np-rx').innerHTML=`<b>Prescription loaded from the Chancy firmware:</b> ${RITU_RX.map(r=>`${r.name} ${r.dose} ${r.unit} at ${fmtClock(r.slots[0])}`).join(' · ')}.`;
+  $('#np-name').classList.remove('bad');
+  $('#npmodal').classList.add('show');
+  setTimeout(()=>$('#np-name').focus(),50);
+}
+function closeNewPatient(){$('#npmodal').classList.remove('show')}
+$('#newpt').onclick=openNewPatient;
+$('#npcancel').onclick=closeNewPatient;$('#npcancel2').onclick=closeNewPatient;
+$('#npmodal').addEventListener('click',e=>{if(e.target.id==='npmodal')closeNewPatient()});
+let npBusy=false;
+$('#npform').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(npBusy)return;
+  const name=$('#np-name').value.trim();
+  if(!name){$('#np-name').classList.add('bad');$('#np-name').focus();return}
+  const body={name,age:+$('#np-age').value,sex:$('#np-sex').value,cond:$('#np-cond').value.trim()||'New patient',
+    blood:$('#np-blood').value,wt:+$('#np-wt').value,ht:+$('#np-ht').value,adh:92,steps:1200,
+    allergies:[],vitals:{hr:76,spo2:98,sys:118,dia:76,temp:36.7,rr:15,glu:98},
+    devices:[{kind:'Wrist wearable'}],rx:RITU_RX};
+  const btn=$('#npsave');npBusy=true;btn.disabled=true;btn.textContent='Creating…';
+  try{const pt=await createNewPatient(body);closeNewPatient();toast(`Created ${pt.name} · Chancy screen flashing`)}
+  catch(err){
+    if(err.message==='409'){const p=P.find(x=>x.name===name);if(p){closeNewPatient();await afterNewPatient(p.id,p.name);toast(`${p.name} already exists — flashed her device`)}else toast('A patient with that name already exists')}
+    else toast('Could not create patient — is the server running?');
+  }finally{npBusy=false;btn.disabled=false;btn.textContent='Create patient & flash device'}
+});
+
+
 /* ---------- wiring ---------- */
-function setView(v){if(v==='devices')renderDevices();document.body.dataset.view=v;$$('.nav').forEach(n=>n.classList.toggle('on',n.dataset.nav===v));$('.content').scrollTo({top:0});if(v==='overview')requestAnimationFrame(renderTrend)}
+function setView(v){if(v==='devices')renderDevices();document.body.dataset.view=v;$$('.nav').forEach(n=>n.classList.toggle('on',n.dataset.nav===v));$('.content').scrollTo({top:0});if(v==='overview')requestAnimationFrame(renderTrend);if(v==='wear')requestAnimationFrame(renderWear)}
 $$('.nav').forEach(n=>n.onclick=()=>setView(n.dataset.nav));
 $('#goRx').onclick=()=>setView('rx');
 $('#bell').onclick=()=>{setView('overview');$('.rrail').scrollTo({top:0,behavior:'smooth'})};
 function selectPatient(id){
   S.sel=id;if(S.editId)resetForm();
   renderList();renderHead();renderVitals();renderDetails();renderTrend();renderMini();renderRxList();renderSlip();
+  if(document.body.dataset.view==='wear'){devIdx=0;renderWear()}
+  if(W.on)startWatch();
 }
 ['#plist','#appts','#alerts'].forEach(s=>$(s).addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(b)selectPatient(+b.dataset.id)}));
 $('#q').addEventListener('input',e=>{S.q=e.target.value;renderList()});
@@ -644,6 +1106,11 @@ function connect(){
     const dv=DEV.find(x=>x.id===d.device_id);if(dv){dv.last_seen=d.ts;if(d.battery!=null)dv.battery=d.battery}
     LOG.unshift({...d,name:p.name});LOG.length=Math.min(LOG.length,14);
     refreshAll();
+  });
+  es.addEventListener('patient',e=>{
+    const d=JSON.parse(e.data);
+    if(lastLocal.id===d.patient_id&&Date.now()-lastLocal.at<6000)return;   // the tab that created it already flashed
+    afterNewPatient(d.patient_id,d.name).then(()=>toast(`New patient ${d.name} · device flashing`));
   });
 }
 setInterval(async()=>{                          // refresh hourly history; live values arrive via the stream
@@ -667,8 +1134,9 @@ async function boot(){
   lastAny=Math.max(0,...P.map(p=>p.lastTs));
   $('#today').textContent=today.toLocaleDateString('en',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   selectPatient([...P].sort((a,b)=>score(b)-score(a))[0].id);
+  selectPatient([...P].sort((a,b)=>score(b)-score(a))[0].id);
   renderToday();renderAlerts();resetForm();renderDevices();connect();
-  addEventListener('resize',renderTrend);
+  addEventListener('resize',()=>{renderTrend();if(document.body.dataset.view==='wear')sizeDevice()});
 }
 boot();
 </script>

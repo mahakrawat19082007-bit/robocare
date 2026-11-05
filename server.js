@@ -115,6 +115,76 @@ const setSteps = db.prepare('UPDATE patients SET steps=? WHERE id=?');
 const clients = new Set();
 const fail = (status, msg) => Object.assign(new Error(msg), { status });
 
+/* ---------------- registering a patient (dashboard "New patient") ---------------- */
+// A patient added from the dashboard gets a wrist wearable, a baseline set of vitals,
+// 24h of history (so the charts and the overview have something to show) and, optionally,
+// a prescription schedule. The dashboard is told over SSE so the hardware mockup can flash.
+const insPatient = db.prepare('INSERT INTO patients(name,age,sex,cond,blood,wt,ht,adh,allergies,sleep,steps) VALUES(?,?,?,?,?,?,?,?,?,?,?)');
+const insDevice = db.prepare('INSERT INTO devices(id,patient_id,kind,battery,last_seen) VALUES(?,?,?,NULL,0) ON CONFLICT(id) DO UPDATE SET patient_id=excluded.patient_id, kind=excluded.kind');
+const insRxFull = db.prepare('INSERT INTO prescriptions VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)');
+const DEFAULT_VITALS = { hr: 74, spo2: 98, sys: 118, dia: 76, temp: 36.7, rr: 15, glu: 96 };
+const HIST_AMP = { hr: 6, spo2: 1, sys: 6, dia: 3.5, temp: .2, rr: 1.3, glu: 12 };
+
+function seedHistory(pid, deviceId, base) {
+  const now = Date.now();
+  db.exec('BEGIN');
+  for (let t = now - 864e5; t < now; t += 5 * 60e3) {          // same cadence as the demo seed
+    const ph = (t / 864e5) * Math.PI * 2 + pid, v = {};
+    for (const m of METRICS) v[m] = +(base[m] + Math.sin(ph + METRICS.indexOf(m)) * HIST_AMP[m] * .6 + rnd(-HIST_AMP[m], HIST_AMP[m]) * .5).toFixed(m === 'temp' ? 1 : 0);
+    v.spo2 = Math.min(100, v.spo2);
+    insReading.run(pid, deviceId, t, v.hr, v.spo2, v.sys, v.dia, v.temp, v.rr, v.glu);
+  }
+  db.exec('COMMIT');
+}
+
+function createPatient(b) {
+  const name = String(b?.name ?? '').trim().slice(0, 60);
+  if (!name) throw fail(400, 'need a patient name');
+  if (db.prepare('SELECT 1 FROM patients WHERE name=?').get(name)) throw fail(409, 'a patient with that name already exists');
+
+  const num = (key, a, z, d) => { const n = Number(b[key]); return Number.isFinite(n) ? Math.round(clampN(n, a, z) * 10) / 10 : d; };
+  const age = Math.round(clampN(Number.isFinite(+b.age) ? +b.age : 34, 0, 120));
+  const sex = /^[MFO]$/.test(String(b.sex ?? '')) ? String(b.sex) : 'F';
+  const cond = String(b.cond ?? 'New patient').slice(0, 80);
+  const blood = String(b.blood ?? 'O+').slice(0, 8);
+  const wt = num('wt', 20, 300, 62), ht = num('ht', 80, 250, 160);
+  const adh = Math.round(clampN(Number.isFinite(+b.adh) ? +b.adh : 92, 0, 100));
+  const allergies = JSON.stringify(Array.isArray(b.allergies) ? b.allergies.map(String).slice(0, 20) : []);
+  const sleep = JSON.stringify(Array.isArray(b.sleep) && b.sleep.length ? b.sleep.map(Number).slice(-7) : [7, 6.8, 7.2, 7.5, 6.9, 7.4, 7.1]);
+  const steps = Math.max(0, Math.round(Number.isFinite(+b.steps) ? +b.steps : 0));
+  const base = {};
+  for (const m of METRICS) base[m] = Number.isFinite(+b.vitals?.[m]) ? clampN(+b.vitals[m], RANGE[m][0], RANGE[m][1]) : DEFAULT_VITALS[m];
+
+  const { lastInsertRowid } = insPatient.run(name, age, sex, cond, blood, wt, ht, adh, allergies, sleep, steps);
+  const pid = Number(lastInsertRowid);
+
+  // devices: a wrist wearable by default (that is what the smartwatch mockup reports as)
+  const list = Array.isArray(b.devices) && b.devices.length ? b.devices.slice(0, 4) : [{ kind: 'Wrist wearable' }];
+  const PRE = { 'Wrist wearable': 'W', 'BP cuff': 'C', 'Glucometer': 'G', 'Pulse oximeter': 'O', 'Chest patch': 'P', 'Thermometer': 'T' };
+  let watchId = `VT-W${pid}`;
+  list.forEach((d, i) => {
+    const kind = String(d?.kind ?? 'Wrist wearable').slice(0, 40);
+    const id = String(d?.id || `VT-${PRE[kind] || 'D'}${pid}${i ? i + 1 : ''}`).slice(0, 40);
+    if (kind === 'Wrist wearable') watchId = id;
+    insDevice.run(id, pid, kind);
+  });
+
+  // prescription schedule sent with the patient (the Chancy screen reads this)
+  if (Array.isArray(b.rx)) b.rx.slice(0, 20).forEach((r, i) => {
+    if (!r || !String(r.name ?? '').trim()) return;
+    const slots = Array.isArray(r.slots) ? r.slots.filter(t => /^\d{2}:\d{2}$/.test(String(t))).sort().slice(0, 4) : [];
+    insRxFull.run(`p${pid}-${i}`, pid, String(r.name).slice(0, 80), String(r.dose ?? ''), String(r.unit ?? ''),
+      String(r.form ?? 'Tablet'), JSON.stringify(slots), String(r.meal ?? 'Any time'), Math.max(0, +r.days || 0),
+      String(r.start ?? new Date().toISOString().slice(0, 10)), String(r.notes ?? ''), 'active', Date.now());
+  });
+
+  seedHistory(pid, watchId, base);
+
+  const ev = { patient_id: pid, name, ts: Date.now() };
+  for (const c of clients) c.write(`event: patient\ndata: ${JSON.stringify(ev)}\n\n`);
+  return { id: pid, name, watch: watchId };
+}
+
 function ingest(r) {
   if (!r || typeof r !== 'object') throw fail(400, 'reading must be a JSON object');
   const dev = getDevice.get(String(r.device_id ?? ''));
@@ -179,6 +249,11 @@ async function api(req, res, url) {
     db.prepare('INSERT INTO devices(id,patient_id,kind,battery,last_seen) VALUES(?,?,?,NULL,0) ON CONFLICT(id) DO UPDATE SET patient_id=excluded.patient_id, kind=excluded.kind')
       .run(String(b.id).slice(0, 40), +b.patient_id, String(b.kind).slice(0, 40));
     return send(res, 201, { ok: true });
+  }
+  if (m === 'POST' && p === '/api/patients') {                       // dashboard "New patient"
+    if (!isLocal(req) && !hasKey(req)) throw fail(403, 'local only');
+    const b = await readBody(req), patient = createPatient(b);
+    return send(res, 201, { ok: true, patient });
   }
   if ((m === 'POST' && p === '/api/prescriptions') || (m === 'PUT' && p.startsWith('/api/prescriptions/'))) {
     const b = await readBody(req), id = m === 'PUT' ? decodeURIComponent(p.split('/').pop()) : String(b.id || 'r' + Date.now());
