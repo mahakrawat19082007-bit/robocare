@@ -68,7 +68,7 @@ Other endpoints: `GET /api/patients` (latest values + 24h hourly history), `POST
   device, seeds 24 h of history, stores the prescriptions and emits a `patient` SSE event; the
   dashboard switches to the Wearable view and flashes the new name on the Chancy screen.
 - Ritu's schedule mirrors the Chancy preview: Metformin 500 mg at 8:00 AM, Amlodipine 5 mg at
-  9:00 AM, Vitamin D3 1000 IU at 1:00 PM, Paracetamol 500 mg at 6:00 PM and Atorvastatin 10 mg at
+  9:00 AM, Vitamin D3 1000 IU at 3:00 PM, Paracetamol 500 mg at 6:00 PM and Atorvastatin 10 mg at
   9:00 PM. It lives in the `RITU_RX` list in `public/index.html`.
 
 ## ESP32 example (MAX30102 pulse oximeter)
